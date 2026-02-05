@@ -59,5 +59,6 @@
     "source.fixAll.biome": "explicit",
     "source.organizeImports.biome": "explicit"
   },
-  "sort-imports.on-save": false
+  "sort-imports.on-save": false,
+  "tailwindCSS.lint.suggestCanonicalClasses": "ignore"
 }
