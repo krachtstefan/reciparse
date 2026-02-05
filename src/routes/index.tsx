@@ -59,7 +59,9 @@ function App() {
             <img
               alt="TanStack Logo"
               className="h-24 w-24 md:h-32 md:w-32"
+              height="128"
               src="/tanstack-circle-logo.png"
+              width="128"
             />
             <h1 className="font-black text-6xl text-white [letter-spacing:-0.08em] md:text-7xl">
               <span className="text-gray-300">TANSTACK</span>{" "}
@@ -96,10 +98,11 @@ function App() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-16">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid-cyols-1 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => (
             <div
               className="rounded-xl border border-slate-700 bg-slate-800/50 p-6 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/50 hover:shadow-cyan-500/10 hover:shadow-lg"
+              // biome-ignore lint/suspicious/noArrayIndexKey: this is a static list
               key={index}
             >
               <div className="mb-4">{feature.icon}</div>
