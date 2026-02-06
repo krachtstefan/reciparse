@@ -121,3 +121,9 @@ Biome's linter will catch most issues automatically. Focus your attention on:
 ---
 
 Most formatting and common issues are automatically fixed by Biome. Run `pnpm dlx ultracite fix` before committing to ensure compliance.
+
+---
+
+## Linear Issue Management
+
+When interacting with Linear issues via MCP tools, **only read and write issues that belong to the "reciparse" project**. Always filter by `project: "reciparse"` when listing, creating, or updating issues. Do not read, modify, or create issues in any other project.
