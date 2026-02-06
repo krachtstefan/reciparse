@@ -254,6 +254,7 @@ src/
 Defined in `convex/schema.ts` using Convex's `defineSchema` and `defineTable` with `v` validators.
 
 ### tenants
+
 | Field | Type | Notes |
 |---|---|---|
 | name | `v.optional(v.string())` | Optional display name |
@@ -266,6 +267,7 @@ Defined in `convex/schema.ts` using Convex's `defineSchema` and `defineTable` wi
 **Indexes**: `by_apiKeyPrefix` on `["apiKeyPrefix"]`
 
 ### recipeSpecs
+
 | Field | Type | Notes |
 |---|---|---|
 | tenantId | `v.id("tenants")` | Reference to tenants table |
@@ -277,6 +279,7 @@ Defined in `convex/schema.ts` using Convex's `defineSchema` and `defineTable` wi
 **Indexes**: `by_tenantId` on `["tenantId"]`
 
 ### jobs
+
 | Field | Type | Notes |
 |---|---|---|
 | tenantId | `v.id("tenants")` | Reference to tenants table |
