@@ -2,7 +2,12 @@ name: ci
 
 on:
   push:
+    branches: [main]
   pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -13,8 +18,6 @@ jobs:
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -25,8 +28,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Run linting
+        run: pnpm check
+
       - name: Run tests
         run: pnpm test
 
-      - name: Run linting
-        run: pnpm check
+      - name: Build
+        run: pnpm build
