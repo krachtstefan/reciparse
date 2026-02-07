@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { api } from "convex/_generated/api";
+import { useQuery } from "convex/react";
 import {
   Route as RouteIcon,
   Server,
@@ -11,6 +13,7 @@ import {
 export const Route = createFileRoute("/")({ component: App });
 
 function App() {
+  const recipes = useQuery(api.recipe.getRecipes);
   const features = [
     {
       icon: <Zap className="h-12 w-12 text-cyan-400" />,
@@ -98,6 +101,23 @@ function App() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-16">
+        <div className="mb-10 rounded-xl border border-slate-700 bg-slate-800/40 p-6">
+          <h2 className="mb-4 font-semibold text-2xl text-white">Recipes</h2>
+          {recipes ? (
+            <ul className="grid gap-2 text-white">
+              {recipes.map((recipe) => (
+                <li
+                  className="rounded-lg border border-slate-700 bg-slate-900/40 px-4 py-2"
+                  key={recipe._id}
+                >
+                  {recipe.title}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-400">Loading recipes...</p>
+          )}
+        </div>
         <div className="grid-cyols-1 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => (
             <div
