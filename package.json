@@ -3,16 +3,21 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "npm-run-all --parallel dev:backend dev:frontend",
+    "dev": "npm-run-all --parallel dev:*",
     "dev:backend": "convex dev",
     "dev:frontend": "vite dev --open --host",
     "build": "pnpm run check && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "check": "ultracite check",
-    "fix": "ultracite fix",
-    "fix:unsafe": "ultracite fix --unsafe",
-    "knip": "knip"
+    "check": "npm-run-all --parallel check:*",
+    "check:ultracite": "ultracite check",
+    "check:knip": "knip",
+    "fix": "npm-run-all --parallel fix:*",
+    "fix:ultracite": "ultracite fix",
+    "fix:knip": "knip --fix --format",
+    "fix-unsafe": "npm-run-all --parallel fix-unsafe:*",
+    "fix-unsafe:ultracite": "ultracite fix --unsafe",
+    "fix-unsafe:knip": "knip --fix --allow-remove-files --format"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",
