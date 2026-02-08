@@ -8,7 +8,7 @@
     "dev:frontend": "vite dev --open --host",
     "build": "pnpm run check && vite build",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run --watch",
     "check": "npm-run-all --parallel check:*",
     "check:ultracite": "ultracite check",
     "check:knip": "knip",
