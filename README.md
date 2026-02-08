@@ -11,10 +11,18 @@ pnpm dev
 
 # Building For Production
 
-To build this application for production:
+To build this application for production (runs checks and tests first):
 
 ```bash
 pnpm build
+```
+
+## Quality Checks
+
+Run the full quality gate (lint, unused exports, tests):
+
+```bash
+pnpm check
 ```
 
 ## Testing
