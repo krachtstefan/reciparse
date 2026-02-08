@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { api } from "convex/_generated/api";
-import { useQuery } from "convex/react";
+import type { Id } from "convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
 import {
   Route as RouteIcon,
   Server,
@@ -9,11 +10,52 @@ import {
   Waves,
   Zap,
 } from "lucide-react";
+import { type FormEvent, useRef, useState } from "react";
 
 export const Route = createFileRoute("/")({ component: App });
 
 function App() {
   const recipes = useQuery(api.recipe.getRecipes);
+  const generateUploadUrl = useMutation(api.recipe.generateUploadUrl);
+  const createRecipe = useMutation(api.recipe.createRecipe);
+
+  const [title, setTitle] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleCreateRecipe(event: FormEvent) {
+    event.preventDefault();
+    if (!title.trim()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      let imageId: Id<"_storage"> | undefined;
+
+      if (selectedImage) {
+        const uploadUrl = await generateUploadUrl();
+        const result = await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "Content-Type": selectedImage.type },
+          body: selectedImage,
+        });
+        const { storageId } = await result.json();
+        imageId = storageId;
+      }
+
+      await createRecipe({ title: title.trim(), imageId });
+      setTitle("");
+      setSelectedImage(null);
+      if (imageInputRef.current) {
+        imageInputRef.current.value = "";
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   const features = [
     {
       icon: <Zap className="h-12 w-12 text-cyan-400" />,
@@ -103,14 +145,71 @@ function App() {
       <section className="mx-auto max-w-7xl px-6 py-16">
         <div className="mb-10 rounded-xl border border-slate-700 bg-slate-800/40 p-6">
           <h2 className="mb-4 font-semibold text-2xl text-white">Recipes</h2>
+
+          <form
+            className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end"
+            onSubmit={handleCreateRecipe}
+          >
+            <div className="flex flex-1 flex-col gap-1">
+              <label
+                className="font-medium text-gray-300 text-sm"
+                htmlFor="recipe-title"
+              >
+                Title
+              </label>
+              <input
+                className="rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-white placeholder:text-gray-500 focus:border-cyan-500 focus:outline-none"
+                disabled={isSubmitting}
+                id="recipe-title"
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Recipe title"
+                type="text"
+                value={title}
+              />
+            </div>
+            <div className="flex flex-1 flex-col gap-1">
+              <label
+                className="font-medium text-gray-300 text-sm"
+                htmlFor="recipe-image"
+              >
+                Image (optional)
+              </label>
+              <input
+                accept="image/*"
+                className="rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-gray-300 file:mr-3 file:rounded file:border-0 file:bg-cyan-600 file:px-3 file:py-1 file:font-medium file:text-sm file:text-white focus:border-cyan-500 focus:outline-none"
+                disabled={isSubmitting}
+                id="recipe-image"
+                onChange={(e) => setSelectedImage(e.target.files?.[0] ?? null)}
+                ref={imageInputRef}
+                type="file"
+              />
+            </div>
+            <button
+              className="rounded-lg bg-cyan-500 px-6 py-2 font-semibold text-white transition-colors hover:bg-cyan-600 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={isSubmitting || !title.trim()}
+              type="submit"
+            >
+              {isSubmitting ? "Adding..." : "Add Recipe"}
+            </button>
+          </form>
+
           {recipes ? (
             <ul className="grid gap-2 text-white">
               {recipes.map((recipe) => (
                 <li
-                  className="rounded-lg border border-slate-700 bg-slate-900/40 px-4 py-2"
+                  className="flex items-center gap-4 rounded-lg border border-slate-700 bg-slate-900/40 px-4 py-2"
                   key={recipe._id}
                 >
-                  {recipe.title}
+                  {recipe.imageUrl ? (
+                    <img
+                      alt={recipe.title}
+                      className="h-12 w-12 rounded object-cover"
+                      height={48}
+                      src={recipe.imageUrl}
+                      width={48}
+                    />
+                  ) : null}
+                  <span>{recipe.title}</span>
                 </li>
               ))}
             </ul>
