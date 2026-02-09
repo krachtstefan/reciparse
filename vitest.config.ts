@@ -4,6 +4,9 @@ import { defineConfig } from "vitest/config";
 
 // Keep Vitest config minimal to avoid Vite plugins holding open handles.
 const config = defineConfig({
+  test: {
+    include: ["src/**/*.test.ts"],
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
