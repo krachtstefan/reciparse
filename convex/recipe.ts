@@ -1,16 +1,18 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { serializeRecipe } from "./helper";
 
 export const getRecipes = query({
   handler: async (ctx) => {
     const recipes = await ctx.db.query("recipes").collect();
     return Promise.all(
-      recipes.map(async (recipe) => ({
-        ...recipe,
-        imageUrl: recipe.imageId
+      recipes.map(async (recipe) => {
+        const imageUrl = recipe.imageId
           ? await ctx.storage.getUrl(recipe.imageId)
-          : null,
-      }))
+          : null;
+
+        return serializeRecipe(recipe, imageUrl);
+      })
     );
   },
 });
