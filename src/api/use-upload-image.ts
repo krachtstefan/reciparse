@@ -1,14 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
 import type { Id } from "convex/_generated/dataModel";
+import { z } from "zod";
 
 type UploadImageVariables = {
   uploadUrl: string;
   image: File;
 };
 
-type UploadImageResponse = {
-  storageId: Id<"_storage">;
-};
+const uploadImageResponseSchema = z.object({
+  storageId: z.custom<Id<"_storage">>((value) => typeof value === "string", {
+    message: "storageId must be a string",
+  }),
+});
 
 export function useUploadImage() {
   return useMutation({
@@ -22,7 +25,9 @@ export function useUploadImage() {
       if (!result.ok) {
         throw new Error(`Upload failed: ${result.statusText}`);
       }
-      return result.json() as Promise<UploadImageResponse>;
+
+      const response = await result.json();
+      return uploadImageResponseSchema.parse(response);
     },
   });
 }
