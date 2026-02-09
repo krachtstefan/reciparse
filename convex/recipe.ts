@@ -29,8 +29,14 @@ export const createRecipe = mutation({
     imageId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
+    const title = args.title.trim();
+
+    if (!title) {
+      throw new Error("Title is required");
+    }
+
     await ctx.db.insert("recipes", {
-      title: args.title,
+      title,
       imageId: args.imageId,
     });
   },
