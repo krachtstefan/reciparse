@@ -7,7 +7,7 @@ import { api } from "../../convex/_generated/api";
 import { useUploadImage } from "../api/use-upload-image";
 
 type RecipeFormProps = {
-  onSuccess?: () => undefined;
+  onSuccess?: () => void;
 };
 
 type RecipeFormValues = {
