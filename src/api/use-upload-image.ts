@@ -11,8 +11,8 @@ type UploadImageResponse = {
 };
 
 export function useUploadImage() {
-  return useMutation<UploadImageResponse, Error, UploadImageVariables>({
-    mutationFn: async ({ uploadUrl, image }) => {
+  return useMutation({
+    mutationFn: async ({ uploadUrl, image }: UploadImageVariables) => {
       const result = await fetch(uploadUrl, {
         method: "POST",
         headers: { "Content-Type": image.type },
@@ -22,7 +22,6 @@ export function useUploadImage() {
       if (!result.ok) {
         throw new Error(`Upload failed: ${result.statusText}`);
       }
-
       return result.json() as Promise<UploadImageResponse>;
     },
   });
