@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run --watch",
     "check": "npm-run-all --parallel check:*",
+    "check:deps": "pnpm install --frozen-lockfile --prefer-offline",
     "check:ultracite": "ultracite check",
     "check:types": "tsc --tsBuildInfoFile .tsbuildinfo --incremental",
     "check:knip": "knip",
