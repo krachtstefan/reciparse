@@ -7,5 +7,17 @@
   ],
   "files": {
     "includes": ["!!.pnpm-store"]
+  },
+  "linter": {
+    "rules": {
+      "style": {
+        "useConsistentTypeDefinitions": {
+          "level": "error",
+          "options": {
+            "style": "type"
+          }
+        }
+      }
+    }
   }
 }

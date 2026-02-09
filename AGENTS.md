@@ -5,9 +5,7 @@ This project uses **Ultracite**, a zero-config preset that enforces strict code 
 ## Quick Reference
 
 - **Format code**: `pnpm dlx ultracite fix`
-- **Check for issues**: `pnpm dlx ultracite check`
-- **Diagnose setup**: `pnpm dlx ultracite doctor`
-- **Run full quality gate**: `pnpm check`
+- **Check for issues**: `pnpm check`
 
 Biome (the underlying engine) provides robust linting and formatting. Most issues are automatically fixable.
 
@@ -21,6 +19,7 @@ Write code that is **accessible, performant, type-safe, and maintainable**. Focu
 
 - Use explicit types for function parameters and return values when they enhance clarity
 - Prefer `unknown` over `any` when the type is genuinely unknown
+- Prefer type aliases over interfaces
 - Use const assertions (`as const`) for immutable values and literal types
 - Leverage TypeScript's type narrowing instead of type assertions
 - Use meaningful variable names instead of magic numbers - extract constants with descriptive names
