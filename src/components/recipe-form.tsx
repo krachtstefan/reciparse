@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import type { Id } from "convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { useRef } from "react";
+import { z } from "zod";
 import { api } from "../../convex/_generated/api";
 import { useUploadImage } from "../api/use-upload-image";
 
@@ -13,6 +14,11 @@ type RecipeFormValues = {
   title: string;
   image: File | null;
 };
+
+const recipeFormSchema = z.object({
+  title: z.string().trim().min(1, "Title is required"),
+  image: z.instanceof(File).nullable(),
+});
 
 export function RecipeForm({ onSuccess }: RecipeFormProps) {
   const generateUploadUrl = useMutation(api.recipe.generateUploadUrl);
@@ -28,6 +34,9 @@ export function RecipeForm({ onSuccess }: RecipeFormProps) {
 
   const form = useForm({
     defaultValues,
+    validators: {
+      onChange: recipeFormSchema,
+    },
     onSubmit: async ({ value }) => {
       if (!value.title.trim()) {
         return;
@@ -80,13 +89,7 @@ export function RecipeForm({ onSuccess }: RecipeFormProps) {
                 >
                   Title
                 </label>
-                <form.Field
-                  name="title"
-                  validators={{
-                    onChange: ({ value }) =>
-                      value.trim() ? undefined : "Title is required",
-                  }}
-                >
+                <form.Field name="title">
                   {(field) => (
                     <input
                       className="rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-white placeholder:text-gray-500 focus:border-cyan-500 focus:outline-none"
