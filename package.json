@@ -11,6 +11,7 @@
     "test": "vitest run --watch",
     "check": "npm-run-all --parallel check:*",
     "check:ultracite": "ultracite check",
+    "check:types": "tsc --tsBuildInfoFile .tsbuildinfo --incremental",
     "check:knip": "knip",
     "check:test": "vitest run",
     "fix": "npm-run-all --parallel fix:*",
