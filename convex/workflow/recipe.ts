@@ -14,29 +14,21 @@ export const generateHeadlineWorkflow = workflow.define({
     recipeId: v.id("recipes"),
   },
   handler: async (step, args): Promise<void> => {
-    try {
-      const { imageUrl } = await step.runQuery(
-        internal.workflow.recipe.getRecipeHeadlineInput,
-        { recipeId: args.recipeId }
-      );
+    const { imageUrl } = await step.runQuery(
+      internal.workflow.recipe.getRecipeHeadlineInput,
+      { recipeId: args.recipeId }
+    );
 
-      const headline = await step.runAction(
-        internal.workflow.recipe.generateHeadlineFromImage,
-        { imageUrl },
-        { retry: true }
-      );
+    const headline = await step.runAction(
+      internal.workflow.recipe.generateHeadlineFromImage,
+      { imageUrl },
+      { retry: true }
+    );
 
-      await step.runMutation(internal.workflow.recipe.updateRecipeHeadline, {
-        recipeId: args.recipeId,
-        headline,
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      await step.runMutation(internal.workflow.recipe.markHeadlineFailed, {
-        recipeId: args.recipeId,
-        error: message,
-      });
-    }
+    await step.runMutation(internal.workflow.recipe.updateRecipeHeadline, {
+      recipeId: args.recipeId,
+      headline,
+    });
   },
 });
 
@@ -113,23 +105,6 @@ export const updateRecipeHeadline = internalMutation({
   handler: async (ctx, args) => {
     await ctx.db.patch(args.recipeId, {
       title: args.headline,
-      headlineStatus: "completed",
-      headlineUpdatedAt: Date.now(),
-      headlineError: undefined,
-    });
-  },
-});
-
-export const markHeadlineFailed = internalMutation({
-  args: {
-    recipeId: v.id("recipes"),
-    error: v.string(),
-  },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.recipeId, {
-      headlineStatus: "failed",
-      headlineError: args.error,
-      headlineUpdatedAt: Date.now(),
     });
   },
 });
