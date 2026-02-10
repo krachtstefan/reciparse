@@ -23,6 +23,8 @@
     "fix-unsafe:knip": "knip --fix --allow-remove-files --format"
   },
   "dependencies": {
+    "@convex-dev/workflow": "^0.3.4",
+    "@openrouter/ai-sdk-provider": "^1.1.1",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-form": "^1.28.0",
