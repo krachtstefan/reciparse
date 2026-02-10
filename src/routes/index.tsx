@@ -62,7 +62,7 @@ function App() {
                 </button>
               ) : (
                 <span className="font-semibold text-slate-300 text-xs uppercase tracking-wide">
-                  {recipe.status.replace("_", " ")}
+                  {recipe.status.replaceAll("_", " ")}
                 </span>
               )}
             </li>
