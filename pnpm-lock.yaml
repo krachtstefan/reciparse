@@ -12,8 +12,8 @@ importers:
         specifier: ^0.3.4
         version: 0.3.4(@convex-dev/workpool@0.3.1(convex-helpers@0.1.111(@standard-schema/spec@1.1.0)(convex@1.31.7(react@19.2.4))(react@19.2.4)(typescript@5.9.3)(zod@4.3.6))(convex@1.31.7(react@19.2.4)))(convex-helpers@0.1.111(@standard-schema/spec@1.1.0)(convex@1.31.7(react@19.2.4))(react@19.2.4)(typescript@5.9.3)(zod@4.3.6))(convex@1.31.7(react@19.2.4))
       '@openrouter/ai-sdk-provider':
-        specifier: ^1.1.1
-        version: 1.5.4(ai@6.0.77(zod@4.3.6))(zod@4.3.6)
+        specifier: ^2.2.1
+        version: 2.2.1(ai@6.0.77(zod@4.3.6))(zod@4.3.6)
       '@tailwindcss/vite':
         specifier: ^4.0.6
         version: 4.1.18(vite@7.3.1(@types/node@22.19.8)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
@@ -717,15 +717,12 @@ packages:
     resolution: {integrity: sha512-hAX0pT/73190NLqBPPWSdBVGtbY6VOhWYK3qqHqtXQ1gK7kS2yz4+ivsN07hpJ6I3aeMtKP6J6npsEKOAzuTLA==}
     engines: {node: '>=20.0'}
 
-  '@openrouter/ai-sdk-provider@1.5.4':
-    resolution: {integrity: sha512-xrSQPUIH8n9zuyYZR0XK7Ba0h2KsjJcMkxnwaYfmv13pKs3sDkjPzVPPhlhzqBGddHb5cFEwJ9VFuFeDcxCDSw==}
+  '@openrouter/ai-sdk-provider@2.2.1':
+    resolution: {integrity: sha512-VjTSNTDIymAJsyIWw4+qPCMuezCS1kJCQwrPjszaNI+ZIo8PbIHTWNc2Y5pYO+ymYbOXKEvedFZxXsEkytOJSA==}
     engines: {node: '>=18'}
     peerDependencies:
-      ai: ^5.0.0
-      zod: ^3.24.1 || ^v4
-
-  '@openrouter/sdk@0.1.27':
-    resolution: {integrity: sha512-RH//L10bSmc81q25zAZudiI4kNkLgxF2E+WU42vghp3N6TEvZ6F0jK7uT3tOxkEn91gzmMw9YVmDENy7SJsajQ==}
+      ai: ^6.0.0
+      zod: ^3.25.0 || ^4.0.0
 
   '@opentelemetry/api@1.9.0':
     resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
@@ -3730,14 +3727,9 @@ snapshots:
 
   '@oozcitak/util@10.0.0': {}
 
-  '@openrouter/ai-sdk-provider@1.5.4(ai@6.0.77(zod@4.3.6))(zod@4.3.6)':
+  '@openrouter/ai-sdk-provider@2.2.1(ai@6.0.77(zod@4.3.6))(zod@4.3.6)':
     dependencies:
-      '@openrouter/sdk': 0.1.27
       ai: 6.0.77(zod@4.3.6)
-      zod: 4.3.6
-
-  '@openrouter/sdk@0.1.27':
-    dependencies:
       zod: 4.3.6
 
   '@opentelemetry/api@1.9.0': {}
