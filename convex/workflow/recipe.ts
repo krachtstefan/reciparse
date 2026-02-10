@@ -15,7 +15,7 @@ export const generateHeadlineWorkflow = workflow.define({
   },
   handler: async (step, args): Promise<void> => {
     const { imageUrl } = await step.runQuery(
-      internal.workflow.recipe.getRecipeHeadlineInput,
+      internal.workflow.recipe.getRecipeImageUrl,
       { recipeId: args.recipeId }
     );
 
@@ -71,7 +71,7 @@ export const generateHeadlineFromImage = internalAction({
   },
 });
 
-export const getRecipeHeadlineInput = internalQuery({
+export const getRecipeImageUrl = internalQuery({
   args: {
     recipeId: v.id("recipes"),
   },
