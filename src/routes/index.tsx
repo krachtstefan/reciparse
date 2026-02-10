@@ -36,6 +36,7 @@ function App() {
         <ul className="grid gap-2 text-white">
           {recipes.map((recipe) => {
             const melaRecipe = recipe.melaRecipe;
+            const title = melaRecipe?.title ?? "";
 
             return (
               <li
@@ -44,19 +45,19 @@ function App() {
               >
                 {recipe.imageUrl ? (
                   <img
-                    alt={recipe.title}
+                    alt={title || "Recipe"}
                     className="h-12 w-12 rounded object-cover"
                     height={48}
                     src={recipe.imageUrl}
                     width={48}
                   />
                 ) : null}
-                <span className="flex-1">{recipe.title}</span>
+                <span className="flex-1">{title || "Untitled recipe"}</span>
                 {recipe.status === "succeeded" && melaRecipe ? (
                   <button
                     className="rounded-md border border-slate-600 px-3 py-1 font-semibold text-slate-100 text-xs transition hover:border-slate-400 hover:text-white"
                     onClick={() => {
-                      downloadMelaRecipe(recipe.title, melaRecipe);
+                      downloadMelaRecipe(title || "recipe", melaRecipe);
                     }}
                     type="button"
                   >
