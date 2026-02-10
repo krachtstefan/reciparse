@@ -46,6 +46,13 @@ const melaRecipeValidator = v.object({
   link: v.string(),
 });
 
+const recipeStatusValidator = v.union(
+  v.literal("pending"),
+  v.literal("in_progress"),
+  v.literal("succeeded"),
+  v.literal("failed")
+);
+
 export const generateHeadlineWorkflow = workflow.define({
   args: {
     recipeId: v.id("recipes"),
@@ -56,16 +63,32 @@ export const generateHeadlineWorkflow = workflow.define({
       { recipeId: args.recipeId }
     );
 
-    const melaRecipe = await step.runAction(
-      internal.workflow.recipe.generateMelaRecipeFromImage,
-      { imageUrl },
-      { retry: true }
-    );
-
-    await step.runMutation(internal.workflow.recipe.updateRecipeFromWorkflow, {
+    await step.runMutation(internal.workflow.recipe.updateRecipeStatus, {
       recipeId: args.recipeId,
-      melaRecipe,
+      status: "in_progress",
     });
+
+    try {
+      const melaRecipe = await step.runAction(
+        internal.workflow.recipe.generateMelaRecipeFromImage,
+        { imageUrl },
+        { retry: true }
+      );
+
+      await step.runMutation(
+        internal.workflow.recipe.updateRecipeFromWorkflow,
+        {
+          recipeId: args.recipeId,
+          melaRecipe,
+        }
+      );
+    } catch (error) {
+      await step.runMutation(internal.workflow.recipe.updateRecipeStatus, {
+        recipeId: args.recipeId,
+        status: "failed",
+      });
+      throw error;
+    }
   },
 });
 
@@ -143,6 +166,19 @@ export const updateRecipeFromWorkflow = internalMutation({
     await ctx.db.patch(args.recipeId, {
       title: args.melaRecipe.title,
       melaRecipe: args.melaRecipe,
+      status: "succeeded",
+    });
+  },
+});
+
+export const updateRecipeStatus = internalMutation({
+  args: {
+    recipeId: v.id("recipes"),
+    status: recipeStatusValidator,
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.recipeId, {
+      status: args.status,
     });
   },
 });

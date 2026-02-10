@@ -7,10 +7,12 @@ export const serializeRecipe = (
   id: Doc<"recipes">["_id"];
   title: string;
   imageUrl: string | null;
+  status: Doc<"recipes">["status"];
   melaRecipe?: Doc<"recipes">["melaRecipe"];
 } => ({
   id: recipe._id,
   title: recipe.title,
   imageUrl,
+  status: recipe.status,
   melaRecipe: recipe.melaRecipe,
 });

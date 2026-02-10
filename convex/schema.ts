@@ -5,6 +5,12 @@ export default defineSchema({
   recipes: defineTable({
     title: v.string(),
     imageId: v.optional(v.id("_storage")),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("in_progress"),
+      v.literal("succeeded"),
+      v.literal("failed")
+    ),
     melaRecipe: v.optional(
       v.object({
         id: v.string(),

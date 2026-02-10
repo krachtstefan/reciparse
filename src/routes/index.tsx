@@ -25,6 +25,61 @@ const downloadMelaRecipe = (title: string, melaRecipe: object) => {
 
 function App() {
   const recipes = useQuery(api.recipe.getRecipes);
+  let recipeContent = <p className="text-gray-400">Loading recipes...</p>;
+
+  if (recipes) {
+    if (recipes.length > 0) {
+      recipeContent = (
+        <ul className="grid gap-2 text-white">
+          {recipes.map((recipe) => (
+            <li
+              className="flex items-center gap-4 rounded-lg border border-slate-700 bg-slate-900/40 px-4 py-2"
+              key={recipe.id}
+            >
+              {recipe.imageUrl ? (
+                <img
+                  alt={recipe.title}
+                  className="h-12 w-12 rounded object-cover"
+                  height={48}
+                  src={recipe.imageUrl}
+                  width={48}
+                />
+              ) : null}
+              <span className="flex-1">{recipe.title}</span>
+              {recipe.status === "succeeded" && recipe.melaRecipe ? (
+                <button
+                  className="rounded-md border border-slate-600 px-3 py-1 font-semibold text-slate-100 text-xs transition hover:border-slate-400 hover:text-white"
+                  onClick={() => {
+                    if (!recipe.melaRecipe) {
+                      return;
+                    }
+
+                    downloadMelaRecipe(recipe.title, recipe.melaRecipe);
+                  }}
+                  type="button"
+                >
+                  Download
+                </button>
+              ) : (
+                <span className="font-semibold text-slate-300 text-xs uppercase tracking-wide">
+                  {recipe.status.replace("_", " ")}
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      );
+    } else {
+      recipeContent = (
+        <div className="rounded-lg border border-slate-700 border-dashed px-4 py-6 text-center">
+          <p className="text-slate-300 text-sm">No recipes yet.</p>
+          <p className="mt-2 text-slate-400 text-xs">
+            Upload an image to generate your first Mela recipe.
+          </p>
+        </div>
+      );
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
@@ -34,43 +89,7 @@ function App() {
 
           <RecipeForm />
 
-          {recipes ? (
-            <ul className="grid gap-2 text-white">
-              {recipes.map((recipe) => (
-                <li
-                  className="flex items-center gap-4 rounded-lg border border-slate-700 bg-slate-900/40 px-4 py-2"
-                  key={recipe.id}
-                >
-                  {recipe.imageUrl ? (
-                    <img
-                      alt={recipe.title}
-                      className="h-12 w-12 rounded object-cover"
-                      height={48}
-                      src={recipe.imageUrl}
-                      width={48}
-                    />
-                  ) : null}
-                  <span className="flex-1">{recipe.title}</span>
-                  <button
-                    className="rounded-md border border-slate-600 px-3 py-1 font-semibold text-slate-100 text-xs transition hover:border-slate-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled={!recipe.melaRecipe}
-                    onClick={() => {
-                      if (!recipe.melaRecipe) {
-                        return;
-                      }
-
-                      downloadMelaRecipe(recipe.title, recipe.melaRecipe);
-                    }}
-                    type="button"
-                  >
-                    Download
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-400">Loading recipes...</p>
-          )}
+          {recipeContent}
         </div>
       </section>
     </div>
