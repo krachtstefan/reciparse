@@ -1,5 +1,4 @@
 import { useForm } from "@tanstack/react-form";
-import type { Id } from "convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { useRef } from "react";
 import { z } from "zod";
@@ -11,13 +10,11 @@ type RecipeFormProps = {
 };
 
 type RecipeFormValues = {
-  title: string;
   image: File | null;
 };
 
 const recipeFormSchema = z.object({
-  title: z.string().trim().min(1, "Title is required"),
-  image: z.instanceof(File).nullable(),
+  image: z.instanceof(File, { message: "Image is required" }),
 });
 
 export function RecipeForm({ onSuccess }: RecipeFormProps) {
@@ -28,7 +25,6 @@ export function RecipeForm({ onSuccess }: RecipeFormProps) {
   const uploadImageMutation = useUploadImage();
 
   const defaultValues: RecipeFormValues = {
-    title: "",
     image: null,
   };
 
@@ -38,22 +34,18 @@ export function RecipeForm({ onSuccess }: RecipeFormProps) {
       onChange: recipeFormSchema,
     },
     onSubmit: async ({ value }) => {
-      if (!value.title.trim()) {
+      if (!value.image) {
         return;
       }
 
-      let imageId: Id<"_storage"> | undefined;
+      const uploadUrl = await generateUploadUrl();
+      const result = await uploadImageMutation.mutateAsync({
+        uploadUrl,
+        image: value.image,
+      });
+      const imageId = result.storageId;
 
-      if (value.image) {
-        const uploadUrl = await generateUploadUrl();
-        const result = await uploadImageMutation.mutateAsync({
-          uploadUrl,
-          image: value.image,
-        });
-        imageId = result.storageId;
-      }
-
-      await createRecipe({ title: value.title.trim(), imageId });
+      await createRecipe({ imageId });
       form.reset();
       if (imageInputRef.current) {
         imageInputRef.current.value = "";
@@ -85,33 +77,9 @@ export function RecipeForm({ onSuccess }: RecipeFormProps) {
               <div className="flex flex-1 flex-col gap-1">
                 <label
                   className="font-medium text-gray-300 text-sm"
-                  htmlFor="recipe-title"
-                >
-                  Title
-                </label>
-                <form.Field name="title">
-                  {(field) => (
-                    <input
-                      className="rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-white placeholder:text-gray-500 focus:border-cyan-500 focus:outline-none"
-                      disabled={isBusy}
-                      id="recipe-title"
-                      onBlur={field.handleBlur}
-                      onChange={(event) =>
-                        field.handleChange(event.target.value)
-                      }
-                      placeholder="Recipe title"
-                      type="text"
-                      value={field.state.value}
-                    />
-                  )}
-                </form.Field>
-              </div>
-              <div className="flex flex-1 flex-col gap-1">
-                <label
-                  className="font-medium text-gray-300 text-sm"
                   htmlFor="recipe-image"
                 >
-                  Image (optional)
+                  Image
                 </label>
                 <form.Field name="image">
                   {(field) => (

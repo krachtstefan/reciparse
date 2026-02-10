@@ -1,6 +1,8 @@
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
 import { serializeRecipe } from "./helper";
+import { workflow } from "./workflow";
 
 export const getRecipes = query({
   handler: async (ctx) => {
@@ -25,19 +27,20 @@ export const generateUploadUrl = mutation({
 
 export const createRecipe = mutation({
   args: {
-    title: v.string(),
-    imageId: v.optional(v.id("_storage")),
+    imageId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
-    const title = args.title.trim();
-
-    if (!title) {
-      throw new Error("Title is required");
-    }
-
-    await ctx.db.insert("recipes", {
-      title,
+    const recipeId = await ctx.db.insert("recipes", {
       imageId: args.imageId,
+      status: "pending",
     });
+
+    await workflow.start(
+      ctx,
+      internal.workflow.recipe.generateHeadlineWorkflow,
+      {
+        recipeId,
+      }
+    );
   },
 });

@@ -23,6 +23,8 @@
     "fix-unsafe:knip": "knip --fix --allow-remove-files --format"
   },
   "dependencies": {
+    "@convex-dev/workflow": "^0.3.4",
+    "@openrouter/ai-sdk-provider": "^2.2.1",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-form": "^1.28.0",
@@ -30,6 +32,7 @@
     "@tanstack/react-router": "^1.132.0",
     "@tanstack/react-router-devtools": "^1.132.0",
     "@tanstack/react-start": "^1.132.0",
+    "ai": "^6.0.77",
     "convex": "^1.31.7",
     "nitro": "npm:nitro-nightly@latest",
     "react": "^19.2.0",
