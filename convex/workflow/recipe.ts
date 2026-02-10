@@ -1,5 +1,6 @@
 import { generateText } from "ai";
 import { v } from "convex/values";
+import { z } from "zod";
 import { internal } from "../_generated/api";
 import {
   internalAction,
@@ -8,6 +9,42 @@ import {
 } from "../_generated/server";
 import { DEFAULT_MODEL, openrouter, sanitizeHeadline } from "./helper";
 import { workflow } from "./index";
+
+const melaRecipeSchema = z
+  .object({
+    id: z.string().min(1),
+    title: z.string().min(1),
+    text: z.string(),
+    images: z.array(z.string()),
+    categories: z.array(z.string()),
+    yield: z.string(),
+    prepTime: z.string(),
+    cookTime: z.string(),
+    totalTime: z.string(),
+    ingredients: z.string(),
+    instructions: z.string(),
+    notes: z.string(),
+    nutrition: z.string(),
+    link: z.string(),
+  })
+  .strict();
+
+const melaRecipeValidator = v.object({
+  id: v.string(),
+  title: v.string(),
+  text: v.string(),
+  images: v.array(v.string()),
+  categories: v.array(v.string()),
+  yield: v.string(),
+  prepTime: v.string(),
+  cookTime: v.string(),
+  totalTime: v.string(),
+  ingredients: v.string(),
+  instructions: v.string(),
+  notes: v.string(),
+  nutrition: v.string(),
+  link: v.string(),
+});
 
 export const generateHeadlineWorkflow = workflow.define({
   args: {
@@ -25,9 +62,16 @@ export const generateHeadlineWorkflow = workflow.define({
       { retry: true }
     );
 
-    await step.runMutation(internal.workflow.recipe.updateRecipeHeadline, {
+    const melaRecipe = await step.runAction(
+      internal.workflow.recipe.generateMelaRecipeFromImage,
+      { imageUrl, headline },
+      { retry: true }
+    );
+
+    await step.runMutation(internal.workflow.recipe.updateRecipeFromWorkflow, {
       recipeId: args.recipeId,
       headline,
+      melaRecipe,
     });
   },
 });
@@ -71,6 +115,47 @@ export const generateHeadlineFromImage = internalAction({
   },
 });
 
+export const generateMelaRecipeFromImage = internalAction({
+  args: {
+    imageUrl: v.string(),
+    headline: v.string(),
+  },
+  returns: melaRecipeValidator,
+  handler: async (_ctx, args) => {
+    if (!process.env.OPENROUTER_API_KEY) {
+      throw new Error("OPENROUTER_API_KEY is not set");
+    }
+
+    const { text } = await generateText({
+      model: openrouter(DEFAULT_MODEL),
+      messages: [
+        {
+          role: "system",
+          content:
+            "You generate a Mela .melarecipe JSON object from an image. Output only valid JSON with all required fields.",
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `Generate a complete .melarecipe JSON using the title "${args.headline}".\n\nRequirements:\n- Output only JSON, no markdown or code fences.\n- Include all fields: id, title, text, images, categories, yield, prepTime, cookTime, totalTime, ingredients, instructions, notes, nutrition, link.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- ingredients and instructions must be newline-separated strings.\n- categories must not include commas.\n- images must be base64 strings if provided; otherwise empty array.\n`,
+            },
+            {
+              type: "image",
+              image: args.imageUrl,
+            },
+          ],
+        },
+      ],
+      temperature: 0.4,
+    });
+
+    const parsed = melaRecipeSchema.parse(JSON.parse(text));
+    return { ...parsed, title: args.headline };
+  },
+});
+
 export const getRecipeImageUrl = internalQuery({
   args: {
     recipeId: v.id("recipes"),
@@ -97,14 +182,16 @@ export const getRecipeImageUrl = internalQuery({
   },
 });
 
-export const updateRecipeHeadline = internalMutation({
+export const updateRecipeFromWorkflow = internalMutation({
   args: {
     recipeId: v.id("recipes"),
     headline: v.string(),
+    melaRecipe: melaRecipeValidator,
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.recipeId, {
       title: args.headline,
+      melaRecipe: args.melaRecipe,
     });
   },
 });
