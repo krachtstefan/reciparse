@@ -5,6 +5,24 @@ import { RecipeForm } from "../components/recipe-form";
 
 export const Route = createFileRoute("/")({ component: App });
 
+const downloadMelaRecipe = (title: string, melaRecipe: object) => {
+  const fileNameBase = title
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+  const fileName = `${fileNameBase || "recipe"}.melarecipe`;
+  const blob = new Blob([JSON.stringify(melaRecipe, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = fileName;
+  anchor.click();
+  URL.revokeObjectURL(url);
+};
+
 function App() {
   const recipes = useQuery(api.recipe.getRecipes);
 
@@ -32,7 +50,21 @@ function App() {
                       width={48}
                     />
                   ) : null}
-                  <span>{recipe.title}</span>
+                  <span className="flex-1">{recipe.title}</span>
+                  <button
+                    className="rounded-md border border-slate-600 px-3 py-1 font-semibold text-slate-100 text-xs transition hover:border-slate-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={!recipe.melaRecipe}
+                    onClick={() => {
+                      if (!recipe.melaRecipe) {
+                        return;
+                      }
+
+                      downloadMelaRecipe(recipe.title, recipe.melaRecipe);
+                    }}
+                    type="button"
+                  >
+                    Download
+                  </button>
                 </li>
               ))}
             </ul>
