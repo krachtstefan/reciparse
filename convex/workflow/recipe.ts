@@ -7,6 +7,10 @@ import {
   internalMutation,
   internalQuery,
 } from "../_generated/server";
+import {
+  melaRecipeValidator,
+  recipeStatusValidator,
+} from "../validators/recipe";
 import { DEFAULT_MODEL, openrouter } from "./helper";
 import { workflow } from "./index";
 
@@ -28,30 +32,6 @@ const melaRecipeSchema = z
     link: z.string(),
   })
   .strict();
-
-const melaRecipeValidator = v.object({
-  id: v.string(),
-  title: v.string(),
-  text: v.string(),
-  images: v.array(v.string()),
-  categories: v.array(v.string()),
-  yield: v.string(),
-  prepTime: v.string(),
-  cookTime: v.string(),
-  totalTime: v.string(),
-  ingredients: v.string(),
-  instructions: v.string(),
-  notes: v.string(),
-  nutrition: v.string(),
-  link: v.string(),
-});
-
-const recipeStatusValidator = v.union(
-  v.literal("pending"),
-  v.literal("in_progress"),
-  v.literal("succeeded"),
-  v.literal("failed")
-);
 
 export const generateHeadlineWorkflow = workflow.define({
   args: {
