@@ -23,62 +23,22 @@ JSON file which you can open in any text editor.
 
 ### Fields
 
----
-
-Field Type Description
-
----
-
-`id` String Identifier. For web-imported
-recipes, Mela uses the URL (without
-schema). Otherwise it's a UUID. Do
-not leave this empty if creating a
-file for import.
-
-`title` String Title of the recipe.
-
-`text` String Short description displayed after
-the title and info in Mela.
-Supported Markdown: links.
-
-`images` \[String\] Array of Base64-encoded images.
-
-`categories` \[String\] Array of category names. (Note:
-Mela currently does not allow
-commas in a category name.)
-
-`yield` String Yield or servings.
-
-`prepTime` String Preparation time.
-
-`cookTime` String Cook time.
-
-`totalTime` String Total time it takes to prepare and
-cook the dish. (This doesn't have
-to equal `prepTime + cookTime`.)
-
-`ingredients` String Ingredients, separated by `\n`.
-Supported Markdown: links and `#`
-for group titles.
-
-`instructions` String Instructions, separated by `\n`.
-Supported Markdown: `#`, `*`, `**`,
-and links.
-
-`notes` String Notes displayed right after the
-instructions. Supported Markdown:
-`#`, `*`, `**`, and links.
-
-`nutrition` String Nutrition information. Supported
-Markdown: `#`, `*`, `**`, and
-links.
-
-`link` String This doesn't have to be a URL ---
-it's basically just the source of
-the recipe and will accept any
-string.
-
----
+| Field          | Type     | Description                                                                                                                                             |
+| -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`           | String   | Identifier. For web-imported recipes, Mela uses the URL (without schema). Otherwise it's a UUID. Do not leave this empty if creating a file for import. |
+| `title`        | String   | Title of the recipe.                                                                                                                                    |
+| `text`         | String   | Short description displayed after the title and info in Mela. Supported Markdown: links.                                                                |
+| `images`       | [String] | Array of Base64-encoded images.                                                                                                                         |
+| `categories`   | [String] | Array of category names. (Note: Mela currently does not allow commas in a category name.)                                                               |
+| `yield`        | String   | Yield or servings.                                                                                                                                      |
+| `prepTime`     | String   | Preparation time.                                                                                                                                       |
+| `cookTime`     | String   | Cook time.                                                                                                                                              |
+| `totalTime`    | String   | Total time it takes to prepare and cook the dish. (This doesn't have to equal `prepTime + cookTime`.)                                                   |
+| `ingredients`  | String   | Ingredients, separated by `\n`. Supported Markdown: links and `#` for group titles.                                                                     |
+| `instructions` | String   | Instructions, separated by `\n`. Supported Markdown: `#`, `*`, `**`, and links.                                                                         |
+| `notes`        | String   | Notes displayed right after the instructions. Supported Markdown: `#`, `*`, `**`, and links.                                                            |
+| `nutrition`    | String   | Nutrition information. Supported Markdown: `#`, `*`, `**`, and links.                                                                                   |
+| `link`         | String   | This doesn't have to be a URL --- it's basically just the source of the recipe and will accept any string.                                              |
 
 ---
 
