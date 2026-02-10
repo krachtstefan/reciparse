@@ -1,4 +1,4 @@
-import { generateText } from "ai";
+import { generateObject } from "ai";
 import { v } from "convex/values";
 import { z } from "zod";
 import { internal } from "../_generated/api";
@@ -82,8 +82,9 @@ export const generateMelaRecipeFromImage = internalAction({
       throw new Error("OPENROUTER_API_KEY is not set");
     }
 
-    const { text } = await generateText({
+    const { object } = await generateObject({
       model: openrouter(DEFAULT_MODEL),
+      schema: melaRecipeSchema,
       messages: [
         {
           role: "system",
@@ -107,7 +108,7 @@ export const generateMelaRecipeFromImage = internalAction({
       temperature: 0.4,
     });
 
-    return melaRecipeSchema.parse(JSON.parse(text));
+    return object;
   },
 });
 
