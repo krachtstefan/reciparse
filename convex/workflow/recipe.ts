@@ -20,7 +20,6 @@ const melaRecipeSchema = z
     title: z.string().min(1),
     text: z.string(),
     images: z.array(z.string()),
-    categories: z.array(z.string()),
     yield: z.string(),
     prepTime: z.string(),
     cookTime: z.string(),

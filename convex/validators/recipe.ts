@@ -5,7 +5,6 @@ export const melaRecipeValidator = v.object({
   title: v.string(),
   text: v.string(),
   images: v.array(v.string()),
-  categories: v.array(v.string()),
   yield: v.string(),
   prepTime: v.string(),
   cookTime: v.string(),
