@@ -27,30 +27,20 @@ export const generateUploadUrl = mutation({
 
 export const createRecipe = mutation({
   args: {
-    title: v.string(),
-    imageId: v.optional(v.id("_storage")),
+    imageId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
-    const title = args.title.trim();
-
-    if (!title) {
-      throw new Error("Title is required");
-    }
-
     const recipeId = await ctx.db.insert("recipes", {
-      title,
       imageId: args.imageId,
       status: "pending",
     });
 
-    if (args.imageId) {
-      await workflow.start(
-        ctx,
-        internal.workflow.recipe.generateHeadlineWorkflow,
-        {
-          recipeId,
-        }
-      );
-    }
+    await workflow.start(
+      ctx,
+      internal.workflow.recipe.generateHeadlineWorkflow,
+      {
+        recipeId,
+      }
+    );
   },
 });

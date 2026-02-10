@@ -7,8 +7,8 @@ import {
 
 export default defineSchema({
   recipes: defineTable({
-    title: v.string(),
-    imageId: v.optional(v.id("_storage")),
+    title: v.optional(v.string()),
+    imageId: v.id("_storage"),
     status: recipeStatusValidator,
     melaRecipe: v.optional(melaRecipeValidator),
   }),
