@@ -7,7 +7,7 @@ import {
   internalMutation,
   internalQuery,
 } from "../_generated/server";
-import { DEFAULT_MODEL, openrouter, sanitizeHeadline } from "./helper";
+import { DEFAULT_MODEL, openrouter } from "./helper";
 import { workflow } from "./index";
 
 const melaRecipeSchema = z
@@ -56,69 +56,22 @@ export const generateHeadlineWorkflow = workflow.define({
       { recipeId: args.recipeId }
     );
 
-    const headline = await step.runAction(
-      internal.workflow.recipe.generateHeadlineFromImage,
-      { imageUrl },
-      { retry: true }
-    );
-
     const melaRecipe = await step.runAction(
       internal.workflow.recipe.generateMelaRecipeFromImage,
-      { imageUrl, headline },
+      { imageUrl },
       { retry: true }
     );
 
     await step.runMutation(internal.workflow.recipe.updateRecipeFromWorkflow, {
       recipeId: args.recipeId,
-      headline,
       melaRecipe,
     });
-  },
-});
-
-export const generateHeadlineFromImage = internalAction({
-  args: {
-    imageUrl: v.string(),
-  },
-  returns: v.string(),
-  handler: async (_ctx, args) => {
-    if (!process.env.OPENROUTER_API_KEY) {
-      throw new Error("OPENROUTER_API_KEY is not set");
-    }
-
-    const { text } = await generateText({
-      model: openrouter(DEFAULT_MODEL),
-      messages: [
-        {
-          role: "system",
-          content:
-            "You generate concise recipe headlines from images. Output only the headline.",
-        },
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: "Generate a short, descriptive recipe headline based on this image.",
-            },
-            {
-              type: "image",
-              image: args.imageUrl,
-            },
-          ],
-        },
-      ],
-      temperature: 0.3,
-    });
-
-    return sanitizeHeadline(text);
   },
 });
 
 export const generateMelaRecipeFromImage = internalAction({
   args: {
     imageUrl: v.string(),
-    headline: v.string(),
   },
   returns: melaRecipeValidator,
   handler: async (_ctx, args) => {
@@ -139,7 +92,7 @@ export const generateMelaRecipeFromImage = internalAction({
           content: [
             {
               type: "text",
-              text: `Generate a complete .melarecipe JSON using the title "${args.headline}".\n\nRequirements:\n- Output only JSON, no markdown or code fences.\n- Include all fields: id, title, text, images, categories, yield, prepTime, cookTime, totalTime, ingredients, instructions, notes, nutrition, link.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- ingredients and instructions must be newline-separated strings.\n- categories must not include commas.\n- images must be base64 strings if provided; otherwise empty array.\n`,
+              text: "Generate a complete .melarecipe JSON for the dish in this image.\n\nRequirements:\n- Output only JSON, no markdown or code fences.\n- Include all fields: id, title, text, images, categories, yield, prepTime, cookTime, totalTime, ingredients, instructions, notes, nutrition, link.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- ingredients and instructions must be newline-separated strings.\n- categories must not include commas.\n- images must be base64 strings if provided; otherwise empty array.\n",
             },
             {
               type: "image",
@@ -151,8 +104,7 @@ export const generateMelaRecipeFromImage = internalAction({
       temperature: 0.4,
     });
 
-    const parsed = melaRecipeSchema.parse(JSON.parse(text));
-    return { ...parsed, title: args.headline };
+    return melaRecipeSchema.parse(JSON.parse(text));
   },
 });
 
@@ -185,12 +137,11 @@ export const getRecipeImageUrl = internalQuery({
 export const updateRecipeFromWorkflow = internalMutation({
   args: {
     recipeId: v.id("recipes"),
-    headline: v.string(),
     melaRecipe: melaRecipeValidator,
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.recipeId, {
-      title: args.headline,
+      title: args.melaRecipe.title,
       melaRecipe: args.melaRecipe,
     });
   },
