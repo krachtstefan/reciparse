@@ -5,9 +5,9 @@ import { RecipeForm } from "../components/recipe-form";
 
 export const Route = createFileRoute("/")({ component: App });
 
-const downloadMelaRecipe = (title: string | undefined, melaRecipe: object) => {
+const downloadMelaRecipe = (title: string, melaRecipe: object) => {
   const fileNameBase = title
-    ?.trim()
+    .trim()
     .toLowerCase()
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "");

@@ -145,7 +145,6 @@ export const updateRecipeFromWorkflow = internalMutation({
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.recipeId, {
-      title: args.melaRecipe.title,
       melaRecipe: args.melaRecipe,
       status: "succeeded",
     });

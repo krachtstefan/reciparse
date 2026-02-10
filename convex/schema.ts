@@ -7,7 +7,6 @@ import {
 
 export default defineSchema({
   recipes: defineTable({
-    title: v.optional(v.string()),
     imageId: v.id("_storage"),
     status: recipeStatusValidator,
     melaRecipe: v.optional(melaRecipeValidator),
