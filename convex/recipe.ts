@@ -40,7 +40,6 @@ export const createRecipe = mutation({
     const recipeId = await ctx.db.insert("recipes", {
       title,
       imageId: args.imageId,
-      headlineStatus: args.imageId ? "pending" : undefined,
     });
 
     if (args.imageId) {
