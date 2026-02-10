@@ -95,7 +95,7 @@ export const generateMelaRecipeFromImage = internalAction({
           content: [
             {
               type: "text",
-              text: "Generate a complete .melarecipe JSON for the dish in this image.\n\nRequirements:\n- Output only JSON, no markdown or code fences.\n- Include all fields: id, title, text, images, categories, yield, prepTime, cookTime, totalTime, ingredients, instructions, notes, nutrition, link.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- ingredients and instructions must be newline-separated strings.\n- categories must not include commas.\n- images must be base64 strings if provided; otherwise empty array.\n",
+              text: "Generate a complete .melarecipe JSON for the dish in this image.\n\nRequirements:\n- Output only JSON, no markdown or code fences.\n- Include these fields: id, title, text, images, yield, prepTime, cookTime, totalTime, ingredients, instructions, notes, nutrition, link.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- ingredients: newline-separated string (\\n). Supports Markdown: links and # for group titles.\n- instructions: newline-separated string (\\n). Supports Markdown: #, *, **, and links.\n- notes: Supports Markdown: #, *, **, and links.\n- nutrition: Supports Markdown: #, *, **, and links.\n- text: Short description displayed after title. Supports Markdown: links only.\n- id: Use a UUID or recipe name as identifier. Do not leave empty.\n- link: Source of the recipe (can be any string, not just URL).\n- images: Array of base64-encoded image strings; empty array if none.\n",
             },
             {
               type: "image",
