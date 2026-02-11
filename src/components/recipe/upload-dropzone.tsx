@@ -5,11 +5,11 @@ import type React from "react";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 
-interface UploadDropzoneProps {
+type UploadDropzoneProps = {
   onImageSelect: (file: File, preview: string) => void;
   preview: string | null;
   onClear: () => void;
-}
+};
 
 export function UploadDropzone({
   onImageSelect,
@@ -20,7 +20,9 @@ export function UploadDropzone({
 
   const handleFile = useCallback(
     (file: File) => {
-      if (!file.type.startsWith("image/")) return;
+      if (!file.type.startsWith("image/")) {
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (e) => {
         onImageSelect(file, e.target?.result as string);
@@ -35,7 +37,9 @@ export function UploadDropzone({
       e.preventDefault();
       setIsDragOver(false);
       const file = e.dataTransfer.files[0];
-      if (file) handleFile(file);
+      if (file) {
+        handleFile(file);
+      }
     },
     [handleFile]
   );
@@ -52,7 +56,9 @@ export function UploadDropzone({
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (file) handleFile(file);
+      if (file) {
+        handleFile(file);
+      }
     },
     [handleFile]
   );
@@ -64,7 +70,9 @@ export function UploadDropzone({
           <img
             alt="Uploaded recipe"
             className="h-auto max-h-[400px] w-full object-contain"
-            src={preview || "/placeholder.svg"}
+            height={400}
+            src={preview}
+            width={600}
           />
         </div>
         <Button
@@ -81,7 +89,8 @@ export function UploadDropzone({
   }
 
   return (
-    <div
+    // biome-ignore lint/a11y/noNoninteractiveElementInteractions: label wraps a file input; drag events are required for drop zone
+    <label
       className={`relative flex cursor-pointer flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-10 transition-all ${
         isDragOver
           ? "scale-[1.01] border-primary bg-primary/5"
@@ -93,7 +102,6 @@ export function UploadDropzone({
     >
       <input
         accept="image/*"
-        aria-label="Upload recipe image"
         className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
         onChange={handleInputChange}
         type="file"
@@ -117,6 +125,6 @@ export function UploadDropzone({
           or click to browse. Supports JPG, PNG, WEBP
         </p>
       </div>
-    </div>
+    </label>
   );
 }

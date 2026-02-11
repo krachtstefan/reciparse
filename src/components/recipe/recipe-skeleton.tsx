@@ -1,6 +1,10 @@
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 
+const META_CARD_KEYS = ["prep", "cook", "yield", "total"] as const;
+const INGREDIENT_KEYS = ["i1", "i2", "i3", "i4", "i5", "i6"] as const;
+const STEP_KEYS = ["s1", "s2", "s3", "s4"] as const;
+
 export function RecipeSkeleton() {
   return (
     <div className="fade-in animate-in space-y-6 duration-300">
@@ -20,8 +24,8 @@ export function RecipeSkeleton() {
 
       {/* Meta grid */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton className="h-20 rounded-lg" key={i} />
+        {META_CARD_KEYS.map((key) => (
+          <Skeleton className="h-20 rounded-lg" key={key} />
         ))}
       </div>
 
@@ -31,11 +35,11 @@ export function RecipeSkeleton() {
       <div>
         <Skeleton className="h-6 w-32" />
         <div className="mt-3 space-y-2">
-          {Array.from({ length: 6 }).map((_, i) => (
+          {INGREDIENT_KEYS.map((key, i) => (
             <Skeleton
-              className="h-4 w-full"
-              key={i}
-              style={{ width: `${70 + Math.random() * 30}%` }}
+              className="h-4"
+              key={key}
+              style={{ width: `${75 + i * 4}%` }}
             />
           ))}
         </div>
@@ -47,8 +51,8 @@ export function RecipeSkeleton() {
       <div>
         <Skeleton className="h-6 w-32" />
         <div className="mt-3 space-y-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div className="flex gap-3" key={i}>
+          {STEP_KEYS.map((key) => (
+            <div className="flex gap-3" key={key}>
               <Skeleton className="h-6 w-6 flex-shrink-0 rounded-full" />
               <div className="flex-1 space-y-1">
                 <Skeleton className="h-4 w-full" />

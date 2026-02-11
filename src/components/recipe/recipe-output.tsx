@@ -1,5 +1,3 @@
-"use client";
-
 import { ChefHat, Clock, Flame, Users, UtensilsCrossed } from "lucide-react";
 import type React from "react";
 import { Badge } from "@/components/ui/badge";
