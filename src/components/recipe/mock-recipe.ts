@@ -1,4 +1,4 @@
-import type { Recipe } from "@/components/recipe/recipe-output"
+import type { Recipe } from "@/components/recipe/recipe-output";
 
 export const mockRecipe: Recipe = {
   title: "Creamy Tuscan Chicken",
@@ -63,4 +63,4 @@ export const mockRecipe: Recipe = {
   ],
   notes:
     "Serve over pasta, rice, or crusty bread. Leftovers keep well in the fridge for up to 3 days. You can substitute half-and-half for heavy cream for a lighter version.",
-}
+};

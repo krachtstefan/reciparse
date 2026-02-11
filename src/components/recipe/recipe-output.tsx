@@ -1,34 +1,33 @@
-"use client"
+"use client";
 
-import React from "react"
-
-import { Clock, Users, ChefHat, Flame, UtensilsCrossed } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import { ChefHat, Clock, Flame, Users, UtensilsCrossed } from "lucide-react";
+import type React from "react";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 export interface Recipe {
-  title: string
-  description: string
-  servings: number
-  prepTime: string
-  cookTime: string
-  totalTime: string
-  difficulty: "Easy" | "Medium" | "Hard"
-  cuisine: string
-  tags: string[]
+  title: string;
+  description: string;
+  servings: number;
+  prepTime: string;
+  cookTime: string;
+  totalTime: string;
+  difficulty: "Easy" | "Medium" | "Hard";
+  cuisine: string;
+  tags: string[];
   ingredients: {
-    group: string
-    items: string[]
-  }[]
+    group: string;
+    items: string[];
+  }[];
   instructions: {
-    step: number
-    text: string
-  }[]
-  notes: string | null
+    step: number;
+    text: string;
+  }[];
+  notes: string | null;
 }
 
 interface RecipeOutputProps {
-  recipe: Recipe
+  recipe: Recipe;
 }
 
 export function RecipeOutput({ recipe }: RecipeOutputProps) {
@@ -36,18 +35,18 @@ export function RecipeOutput({ recipe }: RecipeOutputProps) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="font-serif text-2xl text-foreground text-balance">
+        <h2 className="text-balance font-serif text-2xl text-foreground">
           {recipe.title}
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+        <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
           {recipe.description}
         </p>
         <div className="mt-3 flex flex-wrap gap-1.5">
           {recipe.tags.map((tag) => (
             <Badge
+              className="font-normal text-xs"
               key={tag}
               variant="secondary"
-              className="text-xs font-normal"
             >
               {tag}
             </Badge>
@@ -85,7 +84,7 @@ export function RecipeOutput({ recipe }: RecipeOutputProps) {
 
       {/* Ingredients */}
       <div>
-        <h3 className="flex items-center gap-2 font-serif text-lg text-foreground">
+        <h3 className="flex items-center gap-2 font-serif text-foreground text-lg">
           <UtensilsCrossed className="h-4 w-4 text-primary" />
           Ingredients
         </h3>
@@ -93,13 +92,16 @@ export function RecipeOutput({ recipe }: RecipeOutputProps) {
           {recipe.ingredients.map((group) => (
             <div key={group.group}>
               {recipe.ingredients.length > 1 && (
-                <p className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <p className="mb-1.5 font-medium text-muted-foreground text-xs uppercase tracking-wider">
                   {group.group}
                 </p>
               )}
               <ul className="space-y-1.5">
                 {group.items.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm leading-relaxed text-foreground">
+                  <li
+                    className="flex items-start gap-2 text-foreground text-sm leading-relaxed"
+                    key={i}
+                  >
                     <span className="mt-2 block h-1 w-1 flex-shrink-0 rounded-full bg-primary" />
                     {item}
                   </li>
@@ -114,17 +116,17 @@ export function RecipeOutput({ recipe }: RecipeOutputProps) {
 
       {/* Instructions */}
       <div>
-        <h3 className="flex items-center gap-2 font-serif text-lg text-foreground">
+        <h3 className="flex items-center gap-2 font-serif text-foreground text-lg">
           <ChefHat className="h-4 w-4 text-primary" />
           Instructions
         </h3>
         <ol className="mt-3 space-y-4">
           {recipe.instructions.map((step) => (
-            <li key={step.step} className="flex gap-3">
-              <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+            <li className="flex gap-3" key={step.step}>
+              <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary font-medium text-primary-foreground text-xs">
                 {step.step}
               </span>
-              <p className="text-sm leading-relaxed text-foreground pt-0.5">
+              <p className="pt-0.5 text-foreground text-sm leading-relaxed">
                 {step.text}
               </p>
             </li>
@@ -137,17 +139,17 @@ export function RecipeOutput({ recipe }: RecipeOutputProps) {
         <>
           <Separator />
           <div className="rounded-lg bg-muted/60 p-4">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1.5">
+            <p className="mb-1.5 font-medium text-muted-foreground text-xs uppercase tracking-wider">
               Notes
             </p>
-            <p className="text-sm leading-relaxed text-foreground">
+            <p className="text-foreground text-sm leading-relaxed">
               {recipe.notes}
             </p>
           </div>
         </>
       )}
     </div>
-  )
+  );
 }
 
 function MetaCard({
@@ -155,15 +157,15 @@ function MetaCard({
   label,
   value,
 }: {
-  icon: React.ReactNode
-  label: string
-  value: string
+  icon: React.ReactNode;
+  label: string;
+  value: string;
 }) {
   return (
     <div className="flex flex-col items-center gap-1 rounded-lg bg-muted/60 p-3 text-center">
       <span className="text-muted-foreground">{icon}</span>
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-sm font-medium text-foreground">{value}</span>
+      <span className="text-muted-foreground text-xs">{label}</span>
+      <span className="font-medium text-foreground text-sm">{value}</span>
     </div>
-  )
+  );
 }
