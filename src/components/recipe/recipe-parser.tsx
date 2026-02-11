@@ -22,7 +22,7 @@ export function RecipeParser({ recipeId }: RecipeParserProps) {
           <ScanText className="h-6 w-6 text-primary" />
         </div>
         <h1 className="text-balance font-serif text-3xl text-foreground sm:text-4xl">
-          Recipe Lens
+          Reciparse
         </h1>
         <p className="mx-auto mt-2 max-w-md text-muted-foreground text-sm leading-relaxed">
           Upload a photo of any recipe from a cookbook, Instagram, or a
