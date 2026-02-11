@@ -1,36 +1,52 @@
 "use client";
 
-import { useMutation } from "convex/react";
-import {
-  CheckCircle2,
-  Loader2,
-  RotateCcw,
-  ScanText,
-  Sparkles,
-} from "lucide-react";
+import { useMutation, useQuery } from "convex/react";
+import { RotateCcw, ScanText, Sparkles } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { api } from "../../../convex/_generated/api";
+import type { Id } from "../../../convex/_generated/dataModel";
 import { useUploadImage } from "../../api/use-upload-image";
+import { RecipeOutput } from "./recipe-output";
+import { RecipeSkeleton } from "./recipe-skeleton";
 import { UploadDropzone } from "./upload-dropzone";
 
-type ParseState = "idle" | "loading" | "done";
+type ParseState = "idle" | "uploading" | "processing" | "done" | "failed";
 
 export function RecipeParser() {
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [parseState, setParseState] = useState<ParseState>("idle");
+  const [recipeId, setRecipeId] = useState<Id<"recipes"> | null>(null);
 
   const generateUploadUrl = useMutation(api.recipe.generateUploadUrl);
   const createRecipe = useMutation(api.recipe.createRecipe);
   const uploadImageMutation = useUploadImage();
+
+  const recipe = useQuery(
+    api.recipe.getRecipe,
+    recipeId ? { recipeId } : "skip"
+  );
+
+  const recipeStatus = recipe?.status;
+  const melaRecipe = recipe?.melaRecipe;
+
+  // Derive a single display state from local parseState + backend status.
+  // Backend status takes priority once we have a recipeId.
+  const isDone = recipeStatus === "succeeded" && melaRecipe !== undefined;
+  const isFailed = recipeStatus === "failed" || parseState === "failed";
+  const isProcessing =
+    !(isDone || isFailed) &&
+    (parseState === "uploading" || parseState === "processing");
+  const isIdle = !(isProcessing || isDone || isFailed);
 
   const handleImageSelect = useCallback(
     (selectedFile: File, previewUrl: string) => {
       setPreview(previewUrl);
       setFile(selectedFile);
       setParseState("idle");
+      setRecipeId(null);
     },
     []
   );
@@ -39,13 +55,16 @@ export function RecipeParser() {
     setPreview(null);
     setFile(null);
     setParseState("idle");
+    setRecipeId(null);
   }, []);
 
   const handleParse = useCallback(async () => {
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     try {
-      setParseState("loading");
+      setParseState("uploading");
 
       const uploadUrl = await generateUploadUrl();
       const result = await uploadImageMutation.mutateAsync({
@@ -54,12 +73,12 @@ export function RecipeParser() {
       });
       const imageId = result.storageId;
 
-      await createRecipe({ imageId });
-
-      setParseState("done");
+      setParseState("processing");
+      const id = await createRecipe({ imageId });
+      setRecipeId(id);
     } catch (error) {
       console.error(error);
-      setParseState("idle");
+      setParseState("failed");
     }
   }, [file, generateUploadUrl, uploadImageMutation, createRecipe]);
 
@@ -67,6 +86,7 @@ export function RecipeParser() {
     setPreview(null);
     setFile(null);
     setParseState("idle");
+    setRecipeId(null);
   }, []);
 
   return (
@@ -95,7 +115,7 @@ export function RecipeParser() {
                 <h2 className="font-medium text-foreground text-sm">
                   Source Image
                 </h2>
-                {preview && parseState === "done" && (
+                {preview && isDone && (
                   <Button
                     className="h-8 gap-1.5 text-muted-foreground text-xs hover:text-foreground"
                     onClick={handleReset}
@@ -112,7 +132,7 @@ export function RecipeParser() {
                 onImageSelect={handleImageSelect}
                 preview={preview}
               />
-              {preview && parseState === "idle" && (
+              {preview && isIdle && (
                 <Button
                   className="mt-4 w-full gap-2"
                   onClick={handleParse}
@@ -122,12 +142,29 @@ export function RecipeParser() {
                   Extract Recipe
                 </Button>
               )}
-              {parseState === "loading" && (
+              {isProcessing && (
                 <div className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary/5 p-3">
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                   <span className="font-medium text-primary text-sm">
-                    Uploading and processing...
+                    {parseState === "uploading"
+                      ? "Uploading image..."
+                      : "Analyzing recipe..."}
                   </span>
+                </div>
+              )}
+              {isFailed && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-center text-destructive text-sm">
+                    Something went wrong while processing the recipe.
+                  </p>
+                  <Button
+                    className="w-full gap-2"
+                    onClick={handleReset}
+                    variant="outline"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    Try Again
+                  </Button>
                 </div>
               )}
             </CardContent>
@@ -163,21 +200,21 @@ export function RecipeParser() {
 
         {/* Right: Output */}
         <Card className="border-border bg-card">
-          <CardContent className="h-full min-h-[400px] p-4 sm:p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="font-medium text-foreground text-sm">
                 Extracted Recipe
               </h2>
-              {parseState === "done" && (
+              {isDone && (
                 <span className="flex items-center gap-1 font-medium text-green-600 text-xs">
                   <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
-                  Submitted
+                  Complete
                 </span>
               )}
             </div>
 
-            {parseState === "idle" && (
-              <div className="flex h-full flex-col items-center justify-center py-16 text-center">
+            {isIdle && (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
                 <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
                   <ScanText className="h-6 w-6 text-muted-foreground" />
                 </div>
@@ -191,34 +228,22 @@ export function RecipeParser() {
               </div>
             )}
 
-            {parseState === "loading" && (
-              <div className="flex h-full flex-col items-center justify-center space-y-4 py-16 text-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-muted-foreground text-sm">
-                  Sending recipe to the kitchen...
-                </p>
+            {isProcessing && <RecipeSkeleton />}
+
+            {isDone && melaRecipe && (
+              <div className="fade-in slide-in-from-bottom-2 animate-in duration-500">
+                <RecipeOutput recipe={melaRecipe} />
               </div>
             )}
 
-            {parseState === "done" && (
-              <div className="fade-in slide-in-from-bottom-2 flex h-full animate-in flex-col items-center justify-center py-16 text-center duration-500">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                  <CheckCircle2 className="h-8 w-8 text-green-600" />
+            {isFailed && (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+                  <ScanText className="h-6 w-6 text-destructive" />
                 </div>
-                <h3 className="mb-2 font-medium font-serif text-foreground text-xl">
-                  Recipe Received!
-                </h3>
-                <p className="mx-auto max-w-xs text-muted-foreground text-sm">
-                  Your recipe has been uploaded and is being processed. It will
-                  appear in your recipe book shortly.
+                <p className="mt-4 text-destructive text-sm">
+                  Failed to extract recipe from image.
                 </p>
-                <Button
-                  className="mt-6"
-                  onClick={handleReset}
-                  variant="outline"
-                >
-                  Upload Another
-                </Button>
               </div>
             )}
           </CardContent>

@@ -60,5 +60,7 @@ export const createRecipe = mutation({
         recipeId,
       }
     );
+
+    return recipeId;
   },
 });
