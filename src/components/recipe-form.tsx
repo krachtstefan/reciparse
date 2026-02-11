@@ -1,9 +1,23 @@
+
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { useMutation } from "convex/react";
-import { useRef } from "react";
 import { z } from "zod";
 import { api } from "../../convex/_generated/api";
 import { useUploadImage } from "../api/use-upload-image";
+import { Button } from "./ui/button";
+import { ImagePlus, Loader2, X } from "lucide-react";
+
+import { useMutation } from "convex/react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Field, FieldError, FieldLabel } from "./ui/field";
+import { Input } from "./ui/input";
 
 type RecipeFormProps = {
   onSuccess?: () => void;
@@ -16,6 +30,95 @@ type RecipeFormValues = {
 const recipeFormSchema = z.object({
   image: z.instanceof(File, { message: "Image is required" }),
 });
+
+function RecipeImageField({
+  field,
+  isBusy,
+  inputRef,
+}: {
+  // biome-ignore lint/suspicious/noExplicitAny: FieldApi is too complex to type manually
+  field: any;
+
+  isBusy: boolean;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+}) {
+  const [preview, setPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!field.state.value) {
+      setPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(field.state.value);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [field.state.value]);
+
+  return (
+    <Field>
+      <FieldLabel htmlFor="recipe-image">Recipe Image</FieldLabel>
+      {preview ? (
+        <div className="relative overflow-hidden rounded-md border border-input">
+          <img
+            alt="Recipe preview"
+            className="h-48 w-full object-cover"
+            height={192}
+            src={preview}
+            width={300}
+          />
+          <Button
+            className="absolute top-2 right-2 h-8 w-8 rounded-full shadow-sm"
+            onClick={() => {
+              field.handleChange(null);
+              if (inputRef.current) {
+                inputRef.current.value = "";
+              }
+            }}
+            size="icon"
+            type="button"
+            variant="destructive"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ) : (
+        <button
+          className="flex w-full cursor-pointer flex-col items-center justify-center gap-4 rounded-md border border-input border-dashed p-8 text-center transition-colors hover:bg-muted/50"
+          onClick={() => inputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              inputRef.current?.click();
+            }
+          }}
+          type="button"
+        >
+          <div className="rounded-full bg-muted p-4">
+            <ImagePlus className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <div className="space-y-1">
+            <p className="font-medium text-sm">Click to upload</p>
+            <p className="text-muted-foreground text-xs">
+              SVG, PNG, JPG or GIF
+            </p>
+          </div>
+        </button>
+      )}
+
+      <Input
+        accept="image/*"
+        className="hidden"
+        disabled={isBusy}
+        id="recipe-image"
+        onChange={(event) =>
+          field.handleChange(event.target.files?.[0] ?? null)
+        }
+        ref={inputRef}
+        type="file"
+      />
+      <FieldError errors={field.state.meta.errors} />
+    </Field>
+  );
+}
 
 export function RecipeForm({ onSuccess }: RecipeFormProps) {
   const generateUploadUrl = useMutation(api.recipe.generateUploadUrl);
@@ -56,58 +159,66 @@ export function RecipeForm({ onSuccess }: RecipeFormProps) {
   });
 
   return (
-    <form
-      className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        await form.handleSubmit();
-      }}
-    >
-      <form.Subscribe
-        selector={(state) => ({
-          canSubmit: state.canSubmit,
-          isSubmitting: state.isSubmitting,
-        })}
+    <Card className="mx-auto w-full max-w-md">
+      <CardHeader>
+        <CardTitle>New Recipe</CardTitle>
+        <CardDescription>
+          Upload an image of a recipe to get started.
+        </CardDescription>
+      </CardHeader>
+      <form
+        onSubmit={async (event) => {
+          event.preventDefault();
+          await form.handleSubmit();
+        }}
       >
-        {({ canSubmit, isSubmitting }) => {
-          const isBusy = isSubmitting || uploadImageMutation.isPending;
+        <CardContent className="space-y-4">
+          <form.Subscribe
+            selector={(state) => ({
+              canSubmit: state.canSubmit,
+              isSubmitting: state.isSubmitting,
+            })}
+          >
+            {({ isSubmitting }) => {
+              const isBusy = isSubmitting || uploadImageMutation.isPending;
 
-          return (
-            <>
-              <div className="flex flex-1 flex-col gap-1">
-                <label
-                  className="font-medium text-gray-300 text-sm"
-                  htmlFor="recipe-image"
-                >
-                  Image
-                </label>
+              return (
                 <form.Field name="image">
                   {(field) => (
-                    <input
-                      accept="image/*"
-                      className="rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-gray-300 file:mr-3 file:rounded file:border-0 file:bg-cyan-600 file:px-3 file:py-1 file:font-medium file:text-sm file:text-white focus:border-cyan-500 focus:outline-none"
-                      disabled={isBusy}
-                      id="recipe-image"
-                      onChange={(event) =>
-                        field.handleChange(event.target.files?.[0] ?? null)
-                      }
-                      ref={imageInputRef}
-                      type="file"
+                    <RecipeImageField
+                      field={field}
+                      inputRef={imageInputRef}
+                      isBusy={isBusy}
                     />
                   )}
                 </form.Field>
-              </div>
-              <button
-                className="rounded-lg bg-cyan-500 px-6 py-2 font-semibold text-white transition-colors hover:bg-cyan-600 disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={!canSubmit || isBusy}
-                type="submit"
-              >
-                {isBusy ? "Adding..." : "Add Recipe"}
-              </button>
-            </>
-          );
-        }}
-      </form.Subscribe>
-    </form>
+              );
+            }}
+          </form.Subscribe>
+        </CardContent>
+        <CardFooter>
+          <form.Subscribe
+            selector={(state) => ({
+              canSubmit: state.canSubmit,
+              isSubmitting: state.isSubmitting,
+            })}
+          >
+            {({ canSubmit, isSubmitting }) => {
+              const isBusy = isSubmitting || uploadImageMutation.isPending;
+              return (
+                <Button
+                  className="w-full"
+                  disabled={!canSubmit || isBusy}
+                  type="submit"
+                >
+                  {isBusy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isBusy ? "Adding..." : "Add Recipe"}
+                </Button>
+              );
+            }}
+          </form.Subscribe>
+        </CardFooter>
+      </form>
+    </Card>
   );
 }
