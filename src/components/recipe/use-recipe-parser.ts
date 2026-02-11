@@ -1,16 +1,21 @@
+import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { useUploadImage } from "../../api/use-upload-image";
 
 type ParseState = "idle" | "uploading" | "processing" | "failed";
 
-export function useRecipeParser() {
+export function useRecipeParser(routeRecipeId?: Id<"recipes">) {
+  const navigate = useNavigate();
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [parseState, setParseState] = useState<ParseState>("idle");
   const [recipeId, setRecipeId] = useState<Id<"recipes"> | null>(null);
+
+  const activeRecipeId = routeRecipeId ?? recipeId;
+  const isDetailPage = routeRecipeId !== undefined;
 
   const generateUploadUrl = useMutation(api.recipe.generateUploadUrl);
   const createRecipe = useMutation(api.recipe.createRecipe);
@@ -18,7 +23,7 @@ export function useRecipeParser() {
 
   const recipe = useQuery(
     api.recipe.getRecipe,
-    recipeId ? { recipeId } : "skip"
+    activeRecipeId ? { recipeId: activeRecipeId } : "skip"
   );
 
   const recipeStatus = recipe?.status;
@@ -27,30 +32,47 @@ export function useRecipeParser() {
   // Derive a single display state from local parseState + backend status.
   // Backend status takes priority once we have a recipeId.
   const isDone = recipeStatus === "succeeded" && melaRecipe !== undefined;
-  const isFailed = recipeStatus === "failed" || parseState === "failed";
+  const isFailed =
+    recipeStatus === "failed" || (!activeRecipeId && parseState === "failed");
   const isProcessing =
-    !(isDone || isFailed) &&
-    (parseState === "uploading" || parseState === "processing");
+    (activeRecipeId && !isDone && recipeStatus !== "failed") ||
+    (!activeRecipeId &&
+      (parseState === "uploading" || parseState === "processing"));
   const isIdle = !(isProcessing || isDone || isFailed);
+
+  useEffect(() => {
+    if (routeRecipeId && recipe?.imageUrl) {
+      setPreview(recipe.imageUrl);
+    }
+  }, [routeRecipeId, recipe?.imageUrl]);
 
   const handleImageSelect = useCallback(
     (selectedFile: File, previewUrl: string) => {
+      if (isDetailPage) {
+        return;
+      }
       setPreview(previewUrl);
       setFile(selectedFile);
       setParseState("idle");
       setRecipeId(null);
     },
-    []
+    [isDetailPage]
   );
 
   const handleClear = useCallback(() => {
+    if (isDetailPage) {
+      return;
+    }
     setPreview(null);
     setFile(null);
     setParseState("idle");
     setRecipeId(null);
-  }, []);
+  }, [isDetailPage]);
 
   const handleParse = useCallback(async () => {
+    if (isDetailPage) {
+      return;
+    }
     if (!file) {
       return;
     }
@@ -68,28 +90,45 @@ export function useRecipeParser() {
       setParseState("processing");
       const id = await createRecipe({ imageId });
       setRecipeId(id);
+      await navigate({
+        to: "/recipe/$recipeId",
+        params: { recipeId: id },
+      });
     } catch (error) {
       console.error(error);
       setParseState("failed");
     }
-  }, [file, generateUploadUrl, uploadImageMutation, createRecipe]);
+  }, [
+    createRecipe,
+    file,
+    generateUploadUrl,
+    isDetailPage,
+    navigate,
+    uploadImageMutation,
+  ]);
 
   const handleReset = useCallback(() => {
+    if (isDetailPage) {
+      return;
+    }
     setPreview(null);
     setFile(null);
     setParseState("idle");
     setRecipeId(null);
-  }, []);
+  }, [isDetailPage]);
+
+  const displayParseState = isDetailPage ? "processing" : parseState;
 
   return {
     preview,
-    parseState,
+    parseState: displayParseState,
     melaRecipe,
 
     isIdle,
     isProcessing,
     isDone,
     isFailed,
+    isReadOnly: isDetailPage,
 
     handleImageSelect,
     handleClear,

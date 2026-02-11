@@ -10,6 +10,7 @@ type SourceImagePanelProps = {
   isProcessing: boolean;
   isDone: boolean;
   isFailed: boolean;
+  isReadOnly: boolean;
   onImageSelect: (file: File, previewUrl: string) => void;
   onClear: () => void;
   onParse: () => void;
@@ -23,6 +24,7 @@ export function SourceImagePanel({
   isProcessing,
   isDone,
   isFailed,
+  isReadOnly,
   onImageSelect,
   onClear,
   onParse,
@@ -33,7 +35,7 @@ export function SourceImagePanel({
       <CardContent className="p-4 sm:p-6">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-medium text-foreground text-sm">Source Image</h2>
-          {preview && isDone && (
+          {preview && isDone && !isReadOnly && (
             <Button
               className="h-8 gap-1.5 text-muted-foreground text-xs hover:text-foreground"
               onClick={onReset}
@@ -47,12 +49,13 @@ export function SourceImagePanel({
         </div>
 
         <UploadDropzone
+          isReadOnly={isReadOnly}
           onClear={onClear}
           onImageSelect={onImageSelect}
           preview={preview}
         />
 
-        {preview && isIdle && (
+        {preview && isIdle && !isReadOnly && (
           <Button className="mt-4 w-full gap-2" onClick={onParse} size="lg">
             <Sparkles className="h-4 w-4" />
             Extract Recipe
@@ -61,7 +64,7 @@ export function SourceImagePanel({
 
         {isProcessing && <ProcessingIndicator parseState={parseState} />}
 
-        {isFailed && <FailedIndicator onReset={onReset} />}
+        {isFailed && !isReadOnly && <FailedIndicator onReset={onReset} />}
       </CardContent>
     </Card>
   );

@@ -1,13 +1,19 @@
 "use client";
 
 import { ScanText } from "lucide-react";
+import type { Id } from "../../../convex/_generated/dataModel";
 import { ExtractedRecipePanel } from "./extracted-recipe-panel";
 import { SourceImagePanel } from "./source-image-panel";
 import { TipsCard } from "./tips-card";
 import { useRecipeParser } from "./use-recipe-parser";
 
-export function RecipeParser() {
-  const parser = useRecipeParser();
+type RecipeParserProps = {
+  recipeId?: Id<"recipes">;
+};
+
+export function RecipeParser({ recipeId }: RecipeParserProps) {
+  const parser = useRecipeParser(recipeId);
+  const showTips = !(recipeId || parser.preview);
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
@@ -31,6 +37,7 @@ export function RecipeParser() {
             isFailed={parser.isFailed}
             isIdle={parser.isIdle}
             isProcessing={parser.isProcessing}
+            isReadOnly={parser.isReadOnly}
             onClear={parser.handleClear}
             onImageSelect={parser.handleImageSelect}
             onParse={parser.handleParse}
@@ -38,7 +45,7 @@ export function RecipeParser() {
             parseState={parser.parseState}
             preview={parser.preview}
           />
-          {!parser.preview && <TipsCard />}
+          {showTips && <TipsCard />}
         </div>
 
         <ExtractedRecipePanel
