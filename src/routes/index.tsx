@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { RecipeForm } from "@/components/recipe-form";
+import { RecipeParser } from "@/components/recipe/recipe-parser";
 
 export const Route = createFileRoute("/")({ component: App });
 
 function App() {
-  return <RecipeForm />;
+  return <RecipeParser />;
 }
