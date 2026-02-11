@@ -1,4 +1,6 @@
-import { ScanText } from "lucide-react";
+import { Download, ScanText } from "lucide-react";
+import { useCallback } from "react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RecipeOutput } from "./recipe-output";
 import { RecipeSkeleton } from "./recipe-skeleton";
@@ -35,6 +37,28 @@ export function ExtractedRecipePanel({
   isDone,
   isFailed,
 }: ExtractedRecipePanelProps) {
+  const handleDownload = useCallback(() => {
+    if (!melaRecipe) {
+      return;
+    }
+
+    const json = JSON.stringify(melaRecipe, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const slug = melaRecipe.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+    const filename = `${slug || "recipe"}.melarecipe`;
+
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }, [melaRecipe]);
+
   return (
     <Card className="border-border bg-card">
       <CardContent className="p-4 sm:p-6">
@@ -43,10 +67,21 @@ export function ExtractedRecipePanel({
             Extracted Recipe
           </h2>
           {isDone && (
-            <span className="flex items-center gap-1 font-medium text-green-600 text-xs">
-              <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
-              Complete
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1 font-medium text-green-600 text-xs">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
+                Complete
+              </span>
+              <Button
+                className="h-7 gap-1.5 text-xs"
+                onClick={handleDownload}
+                size="sm"
+                variant="outline"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Download
+              </Button>
+            </div>
           )}
         </div>
 
