@@ -1,9 +1,9 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useState } from "react";
-import { api } from "../../../convex/_generated/api";
-import type { Id } from "../../../convex/_generated/dataModel";
-import { useUploadImage } from "../../api/use-upload-image";
+import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
+import { useUploadImage } from "../../../api/use-upload-image";
 
 type ParseState = "idle" | "uploading" | "processing" | "failed";
 
