@@ -1,35 +1,29 @@
+"use client";
+
 import { RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { UploadDropzone } from "./upload-dropzone";
+import { useRecipeParser } from "./utils/use-recipe-parser";
 
 type SourceImagePanelProps = {
-  preview: string | null;
-  parseState: string;
-  isIdle: boolean;
-  isProcessing: boolean;
-  isDone: boolean;
-  isFailed: boolean;
-  isReadOnly: boolean;
-  onImageSelect: (file: File, previewUrl: string) => void;
-  onClear: () => void;
-  onParse: () => void;
-  onReset: () => void;
+  recipeId?: string;
 };
 
-export function SourceImagePanel({
-  preview,
-  parseState,
-  isIdle,
-  isProcessing,
-  isDone,
-  isFailed,
-  isReadOnly,
-  onImageSelect,
-  onClear,
-  onParse,
-  onReset,
-}: SourceImagePanelProps) {
+export function SourceImagePanel({ recipeId }: SourceImagePanelProps) {
+  const {
+    preview,
+    parseState,
+    isIdle,
+    isProcessing,
+    isDone,
+    isFailed,
+    isReadOnly,
+    handleImageSelect,
+    handleClear,
+    handleParse,
+    handleReset,
+  } = useRecipeParser(recipeId);
   return (
     <Card className="border-border bg-card">
       <CardContent className="p-4 sm:p-6">
@@ -38,7 +32,7 @@ export function SourceImagePanel({
           {preview && isDone && !isReadOnly && (
             <Button
               className="h-8 gap-1.5 text-muted-foreground text-xs hover:text-foreground"
-              onClick={onReset}
+              onClick={handleReset}
               size="sm"
               variant="ghost"
             >
@@ -50,13 +44,13 @@ export function SourceImagePanel({
 
         <UploadDropzone
           isReadOnly={isReadOnly}
-          onClear={onClear}
-          onImageSelect={onImageSelect}
+          onClear={handleClear}
+          onImageSelect={handleImageSelect}
           preview={preview}
         />
 
         {preview && isIdle && !isReadOnly && (
-          <Button className="mt-4 w-full gap-2" onClick={onParse} size="lg">
+          <Button className="mt-4 w-full gap-2" onClick={handleParse} size="lg">
             <Sparkles className="h-4 w-4" />
             Extract Recipe
           </Button>
@@ -64,7 +58,7 @@ export function SourceImagePanel({
 
         {isProcessing && <ProcessingIndicator parseState={parseState} />}
 
-        {isFailed && !isReadOnly && <FailedIndicator onReset={onReset} />}
+        {isFailed && !isReadOnly && <FailedIndicator onReset={handleReset} />}
       </CardContent>
     </Card>
   );

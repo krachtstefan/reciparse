@@ -4,14 +4,12 @@ import { ScanText } from "lucide-react";
 import { ExtractedRecipePanel } from "./extracted-recipe-panel";
 import { SourceImagePanel } from "./source-image-panel";
 import { TipsCard } from "./tips-card";
-import { useRecipeParser } from "./utils/use-recipe-parser";
 
 type RecipeParserProps = {
   recipeId?: string;
 };
 
 export function RecipeParser({ recipeId }: RecipeParserProps) {
-  const parser = useRecipeParser(recipeId);
   const showTips = !recipeId;
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
@@ -30,29 +28,11 @@ export function RecipeParser({ recipeId }: RecipeParserProps) {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-4">
-          <SourceImagePanel
-            isDone={parser.isDone}
-            isFailed={parser.isFailed}
-            isIdle={parser.isIdle}
-            isProcessing={parser.isProcessing}
-            isReadOnly={parser.isReadOnly}
-            onClear={parser.handleClear}
-            onImageSelect={parser.handleImageSelect}
-            onParse={parser.handleParse}
-            onReset={parser.handleReset}
-            parseState={parser.parseState}
-            preview={parser.preview}
-          />
+          <SourceImagePanel recipeId={recipeId} />
           {showTips && <TipsCard />}
         </div>
 
-        <ExtractedRecipePanel
-          isDone={parser.isDone}
-          isFailed={parser.isFailed}
-          isIdle={parser.isIdle}
-          isProcessing={parser.isProcessing}
-          melaRecipe={parser.melaRecipe}
-        />
+        <ExtractedRecipePanel recipeId={recipeId} />
       </div>
     </div>
   );

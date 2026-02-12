@@ -1,42 +1,20 @@
+"use client";
+
 import { Download, ScanText } from "lucide-react";
 import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RecipeOutput } from "./recipe-output";
 import { RecipeSkeleton } from "./recipe-skeleton";
-
-type MelaRecipe = {
-  id: string;
-  title: string;
-  text: string;
-  images: string[];
-  categories: string[];
-  yield: string;
-  prepTime: string;
-  cookTime: string;
-  totalTime: string;
-  ingredients: string;
-  instructions: string;
-  notes: string;
-  nutrition: string;
-  link: string;
-};
+import { useRecipeParser } from "./utils/use-recipe-parser";
 
 type ExtractedRecipePanelProps = {
-  melaRecipe: MelaRecipe | undefined;
-  isIdle: boolean;
-  isProcessing: boolean;
-  isDone: boolean;
-  isFailed: boolean;
+  recipeId?: string;
 };
 
-export function ExtractedRecipePanel({
-  melaRecipe,
-  isIdle,
-  isProcessing,
-  isDone,
-  isFailed,
-}: ExtractedRecipePanelProps) {
+export function ExtractedRecipePanel({ recipeId }: ExtractedRecipePanelProps) {
+  const { melaRecipe, isIdle, isProcessing, isDone, isFailed } =
+    useRecipeParser(recipeId);
   const handleDownload = useCallback(() => {
     if (!melaRecipe) {
       return;
