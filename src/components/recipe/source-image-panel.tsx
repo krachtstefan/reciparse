@@ -108,9 +108,8 @@ export function SourceImagePanel({ recipeId }: SourceImagePanelProps) {
 
 const TIPS = [
   "Make sure the text is clearly readable in the image",
-  "Crop out unnecessary elements around the recipe",
   "Works with cookbook pages, handwritten cards, and screenshots",
-  "Supports multiple languages",
+  "Make sure the image(s) only show one recipe",
 ] as const;
 
 function ProcessingIndicator({ parseState }: { parseState: string }) {
