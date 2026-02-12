@@ -13,7 +13,7 @@ export function RecipeParser({ recipeId }: RecipeParserProps) {
   const showTips = !recipeId;
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-      <header className="mb-8 text-cenyter">
+      <header className="mb-8 text-center">
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
           <ScanText className="h-6 w-6 text-primary" />
         </div>
