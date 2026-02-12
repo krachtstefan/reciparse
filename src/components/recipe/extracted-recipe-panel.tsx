@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "convex/react";
 import { Download, ScanText } from "lucide-react";
 import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
@@ -10,10 +11,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { api } from "../../../convex/_generated/api";
 import { RecipeOutput } from "./recipe-output";
 import { RecipeSkeleton } from "./recipe-skeleton";
 import { downloadMelaRecipe } from "./utils/recipe-download";
-import { useRecipeParser } from "./utils/use-recipe-parser";
 
 type ExtractedRecipePanelProps = {
   recipeId?: string;
@@ -21,7 +22,7 @@ type ExtractedRecipePanelProps = {
 
 export function ExtractedRecipePanel({ recipeId }: ExtractedRecipePanelProps) {
   const { melaRecipe, isIdle, isProcessing, isDone, isFailed } =
-    useRecipeParser(recipeId);
+    useExtractedRecipeState(recipeId);
 
   const handleDownload = useCallback(() => {
     if (!melaRecipe) {
@@ -64,6 +65,28 @@ export function ExtractedRecipePanel({ recipeId }: ExtractedRecipePanelProps) {
       </CardContent>
     </Card>
   );
+}
+
+function useExtractedRecipeState(recipeId?: string) {
+  const activeRecipeId = recipeId ?? null;
+  const recipe = useQuery(
+    api.recipe.getRecipe,
+    activeRecipeId ? { recipeId: activeRecipeId } : "skip"
+  );
+  const recipeStatus = recipe?.status;
+  const melaRecipe = recipe?.melaRecipe;
+  const isDone = recipeStatus === "succeeded" && melaRecipe !== undefined;
+  const isFailed = recipeStatus === "failed";
+  const isProcessing = activeRecipeId !== null && !isDone && !isFailed;
+  const isIdle = !(isProcessing || isDone || isFailed);
+
+  return {
+    melaRecipe,
+    isIdle,
+    isProcessing,
+    isDone,
+    isFailed,
+  };
 }
 
 function IdlePlaceholder() {
