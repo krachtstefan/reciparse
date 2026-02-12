@@ -48,11 +48,7 @@ export function ExtractedRecipePanel({ recipeId }: ExtractedRecipePanelProps) {
       <CardHeader>
         <CardTitle>Extracted Recipe</CardTitle>
         {isDone && (
-          <CardAction className="flex items-center gap-2">
-            <span className="flex items-center gap-1 font-medium text-green-600 text-xs">
-              <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
-              Complete
-            </span>
+          <CardAction>
             <Button
               className="h-7 gap-1.5 text-xs"
               onClick={handleDownload}
