@@ -17,21 +17,16 @@ import { RecipeSkeleton } from "./recipe-skeleton";
 import { downloadMelaRecipe } from "./utils/recipe-download";
 
 type ExtractedRecipePanelProps = {
-  recipeId?: string;
+  recipeId: string;
 };
 
 export function ExtractedRecipePanel({ recipeId }: ExtractedRecipePanelProps) {
-  const activeRecipeId = recipeId ?? null;
-  const recipe = useQuery(
-    api.recipe.getRecipe,
-    activeRecipeId ? { recipeId: activeRecipeId } : "skip"
-  );
+  const recipe = useQuery(api.recipe.getRecipe, { recipeId });
   const melaRecipe = useExtractedMelaRecipe(recipe);
   const recipeStatus = recipe?.status;
   const isDone = recipeStatus === "succeeded" && melaRecipe !== null;
   const isFailed = recipeStatus === "failed";
-  const isProcessing = activeRecipeId !== null && !isDone && !isFailed;
-  const isIdle = !(isProcessing || isDone || isFailed);
+  const isProcessing = !(isDone || isFailed);
 
   const handleDownload = useCallback(() => {
     if (!melaRecipe) {
@@ -60,8 +55,6 @@ export function ExtractedRecipePanel({ recipeId }: ExtractedRecipePanelProps) {
         )}
       </CardHeader>
       <CardContent>
-        {isIdle && <IdlePlaceholder />}
-
         {isProcessing && <RecipeSkeleton />}
 
         {isDone && melaRecipe && (
@@ -80,21 +73,6 @@ type RecipeQueryResult = typeof api.recipe.getRecipe._returnType;
 
 function useExtractedMelaRecipe(recipe?: RecipeQueryResult | null) {
   return useMemo(() => recipe?.melaRecipe ?? null, [recipe?.melaRecipe]);
-}
-
-function IdlePlaceholder() {
-  return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-        <ScanText className="h-6 w-6 text-muted-foreground" />
-      </div>
-      <p className="mt-4 text-muted-foreground text-sm">
-        Upload an image and click{" "}
-        <span className="font-medium text-foreground">Extract Recipe</span> to
-        see results here
-      </p>
-    </div>
-  );
 }
 
 function FailedPlaceholder() {

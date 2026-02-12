@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { RecipeParser } from "@/components/recipe/recipe-parser";
+import { RecipeDetailPage } from "@/components/recipe/recipe-detail-page";
+
 export const Route = createFileRoute("/recipe/$recipeId")({
   component: RecipeDetail,
 });
@@ -7,5 +8,5 @@ export const Route = createFileRoute("/recipe/$recipeId")({
 function RecipeDetail() {
   const { recipeId } = Route.useParams();
 
-  return <RecipeParser recipeId={recipeId} />;
+  return <RecipeDetailPage recipeId={recipeId} />;
 }

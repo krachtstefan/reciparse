@@ -9,14 +9,12 @@ type UploadDropzoneProps = {
   onImageSelect: (file: File, preview: string) => void;
   preview: string | null;
   onClear: () => void;
-  isReadOnly?: boolean;
 };
 
 export function UploadDropzone({
   onImageSelect,
   preview,
   onClear,
-  isReadOnly = false,
 }: UploadDropzoneProps) {
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -77,35 +75,15 @@ export function UploadDropzone({
             width={600}
           />
         </div>
-        {!isReadOnly && (
-          <Button
-            aria-label="Remove image"
-            className="absolute top-3 right-3 rounded-full bg-card text-card-foreground opacity-0 shadow-md transition-opacity hover:bg-secondary group-hover:opacity-100"
-            onClick={onClear}
-            size="icon"
-            variant="secondary"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-    );
-  }
-
-  if (isReadOnly) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-border border-dashed bg-muted/30 p-10 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-          <ImageIcon className="h-6 w-6 text-muted-foreground" />
-        </div>
-        <div>
-          <p className="font-medium text-foreground text-sm">
-            Waiting for source image
-          </p>
-          <p className="mt-1 text-muted-foreground text-xs">
-            The uploaded image will appear here once it loads.
-          </p>
-        </div>
+        <Button
+          aria-label="Remove image"
+          className="absolute top-3 right-3 rounded-full bg-card text-card-foreground opacity-0 shadow-md transition-opacity hover:bg-secondary group-hover:opacity-100"
+          onClick={onClear}
+          size="icon"
+          variant="secondary"
+        >
+          <X className="h-4 w-4" />
+        </Button>
       </div>
     );
   }

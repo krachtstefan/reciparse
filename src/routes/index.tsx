@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { RecipeParser } from "@/components/recipe/recipe-parser";
+import { UploadPage } from "@/components/recipe/upload-page";
 
-export const Route = createFileRoute("/")({ component: App });
-
-function App() {
-  return <RecipeParser />;
-}
+export const Route = createFileRoute("/")({
+  component: UploadPage,
+});
