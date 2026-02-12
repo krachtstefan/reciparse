@@ -1,6 +1,6 @@
 "use client";
 
-import { RotateCcw, Sparkles } from "lucide-react";
+import { LoaderCircle, RotateCcw, Sparkles } from "lucide-react";
 import { RecipeHeader } from "@/components/recipe/recipe-header";
 import { UploadDropzone } from "@/components/recipe/upload-dropzone";
 import { useUploadRecipe } from "@/components/recipe/utils/use-upload-recipe";
@@ -16,17 +16,15 @@ const TIPS = [
 export function UploadPage() {
   const {
     preview,
-    parseState,
-    isIdle,
     isProcessing,
     isFailed,
     handleImageSelect,
     handleClear,
     handleParse,
-    handleReset,
   } = useUploadRecipe();
 
   const showTips = !preview;
+  const showButton = preview && !isFailed;
 
   return (
     <div className="mx-auto w-full max-w-xl px-4 py-8 sm:px-6 lg:px-8">
@@ -62,46 +60,41 @@ export function UploadPage() {
             </div>
           )}
 
-          {preview && isIdle && (
+          {showButton && (
             <Button
               className="mt-4 w-full gap-2"
+              disabled={isProcessing}
               onClick={handleParse}
               size="lg"
             >
-              <Sparkles className="h-4 w-4" />
-              Extract Recipe
+              {isProcessing ? (
+                <>
+                  <LoaderCircle className="animate-spin" />
+                  Uploading image...
+                </>
+              ) : (
+                <>
+                  <Sparkles />
+                  Extract Recipe
+                </>
+              )}
             </Button>
           )}
 
-          {isProcessing && <ProcessingIndicator parseState={parseState} />}
-
-          {isFailed && <FailedIndicator onReset={handleReset} />}
+          {isFailed && <FailedIndicator onClear={handleClear} />}
         </CardContent>
       </Card>
     </div>
   );
 }
 
-function ProcessingIndicator({ parseState }: { parseState: string }) {
-  return (
-    <div className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary/5 p-3">
-      <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      <span className="font-medium text-primary text-sm">
-        {parseState === "uploading"
-          ? "Uploading image..."
-          : "Analyzing recipe..."}
-      </span>
-    </div>
-  );
-}
-
-function FailedIndicator({ onReset }: { onReset: () => void }) {
+function FailedIndicator({ onClear }: { onClear: () => void }) {
   return (
     <div className="mt-4 space-y-2">
       <p className="text-center text-destructive text-sm">
         Something went wrong while processing the recipe.
       </p>
-      <Button className="w-full gap-2" onClick={onReset} variant="outline">
+      <Button className="w-full gap-2" onClick={onClear} variant="outline">
         <RotateCcw className="h-4 w-4" />
         Try Again
       </Button>

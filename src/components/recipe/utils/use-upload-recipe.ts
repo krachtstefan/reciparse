@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { api } from "../../../../convex/_generated/api";
 import { useUploadImage } from "../../../api/use-upload-image";
 
-type ParseState = "idle" | "uploading" | "processing" | "failed";
+type ParseState = "idle" | "uploading" | "failed";
 
 export function useUploadRecipe() {
   const navigate = useNavigate();
@@ -46,7 +46,6 @@ export function useUploadRecipe() {
       });
       const imageId = result.storageId;
 
-      setParseState("processing");
       const id = await createRecipe({ imageId });
       await navigate({
         to: "/recipe/$recipeId",
@@ -58,26 +57,17 @@ export function useUploadRecipe() {
     }
   }, [createRecipe, file, generateUploadUrl, navigate, uploadImageMutation]);
 
-  const handleReset = useCallback(() => {
-    setPreview(null);
-    setFile(null);
-    setParseState("idle");
-  }, []);
-
   const isIdle = parseState === "idle";
-  const isProcessing =
-    parseState === "uploading" || parseState === "processing";
+  const isProcessing = parseState === "uploading";
   const isFailed = parseState === "failed";
 
   return {
     preview,
-    parseState,
     isIdle,
     isProcessing,
     isFailed,
     handleImageSelect,
     handleClear,
     handleParse,
-    handleReset,
   };
 }
