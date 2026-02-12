@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { RecipeOutput } from "./recipe-output";
 import { RecipeSkeleton } from "./recipe-skeleton";
+import { downloadMelaRecipe } from "./utils/recipe-download";
 import { useRecipeParser } from "./utils/use-recipe-parser";
 
 type ExtractedRecipePanelProps = {
@@ -21,26 +22,13 @@ type ExtractedRecipePanelProps = {
 export function ExtractedRecipePanel({ recipeId }: ExtractedRecipePanelProps) {
   const { melaRecipe, isIdle, isProcessing, isDone, isFailed } =
     useRecipeParser(recipeId);
+
   const handleDownload = useCallback(() => {
     if (!melaRecipe) {
       return;
     }
 
-    const json = JSON.stringify(melaRecipe, null, 2);
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const slug = melaRecipe.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-    const filename = `${slug || "recipe"}.melarecipe`;
-
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = filename;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    downloadMelaRecipe(melaRecipe);
   }, [melaRecipe]);
 
   return (
