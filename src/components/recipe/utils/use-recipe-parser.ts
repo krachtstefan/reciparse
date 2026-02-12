@@ -1,8 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { api } from "../../../../convex/_generated/api";
-import type { Id } from "../../../../convex/_generated/dataModel";
 import { useUploadImage } from "../../../api/use-upload-image";
 
 type ParseState = "idle" | "uploading" | "processing" | "failed";
@@ -12,9 +11,7 @@ export function useRecipeParser(routeRecipeId?: string) {
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [parseState, setParseState] = useState<ParseState>("idle");
-  const [recipeId, setRecipeId] = useState<Id<"recipes"> | null>(null);
-
-  const activeRecipeId = routeRecipeId ?? recipeId;
+  const activeRecipeId = routeRecipeId ?? null;
   const isDetailPage = routeRecipeId !== undefined;
 
   const generateUploadUrl = useMutation(api.recipe.generateUploadUrl);
@@ -34,17 +31,15 @@ export function useRecipeParser(routeRecipeId?: string) {
   const isDone = recipeStatus === "succeeded" && melaRecipe !== undefined;
   const isFailed =
     recipeStatus === "failed" || (!activeRecipeId && parseState === "failed");
-  const isProcessing =
-    (activeRecipeId && !isDone && recipeStatus !== "failed") ||
-    (!activeRecipeId &&
-      (parseState === "uploading" || parseState === "processing"));
+  const isBackendProcessing =
+    activeRecipeId !== null && !isDone && recipeStatus !== "failed";
+  const isLocalProcessing =
+    activeRecipeId === null &&
+    (parseState === "uploading" || parseState === "processing");
+  const isProcessing = isBackendProcessing || isLocalProcessing;
   const isIdle = !(isProcessing || isDone || isFailed);
 
-  useEffect(() => {
-    if (routeRecipeId && recipe?.imageUrl) {
-      setPreview(recipe.imageUrl);
-    }
-  }, [routeRecipeId, recipe?.imageUrl]);
+  const displayPreview = isDetailPage ? (recipe?.imageUrl ?? null) : preview;
 
   const handleImageSelect = useCallback(
     (selectedFile: File, previewUrl: string) => {
@@ -54,7 +49,6 @@ export function useRecipeParser(routeRecipeId?: string) {
       setPreview(previewUrl);
       setFile(selectedFile);
       setParseState("idle");
-      setRecipeId(null);
     },
     [isDetailPage]
   );
@@ -66,7 +60,6 @@ export function useRecipeParser(routeRecipeId?: string) {
     setPreview(null);
     setFile(null);
     setParseState("idle");
-    setRecipeId(null);
   }, [isDetailPage]);
 
   const handleParse = useCallback(async () => {
@@ -89,7 +82,6 @@ export function useRecipeParser(routeRecipeId?: string) {
 
       setParseState("processing");
       const id = await createRecipe({ imageId });
-      setRecipeId(id);
       await navigate({
         to: "/recipe/$recipeId",
         params: { recipeId: id },
@@ -114,22 +106,19 @@ export function useRecipeParser(routeRecipeId?: string) {
     setPreview(null);
     setFile(null);
     setParseState("idle");
-    setRecipeId(null);
   }, [isDetailPage]);
 
   const displayParseState = isDetailPage ? "processing" : parseState;
 
   return {
-    preview,
+    preview: displayPreview,
     parseState: displayParseState,
     melaRecipe,
-
     isIdle,
     isProcessing,
     isDone,
     isFailed,
     isReadOnly: isDetailPage,
-
     handleImageSelect,
     handleClear,
     handleParse,
