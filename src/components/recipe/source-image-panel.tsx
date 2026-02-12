@@ -1,5 +1,6 @@
 "use client";
 
+import { Link } from "@tanstack/react-router";
 import { RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,18 +36,32 @@ export function SourceImagePanel({ recipeId }: SourceImagePanelProps) {
     <Card>
       <CardHeader>
         <CardTitle>Source Image</CardTitle>
-        {preview && isDone && !isReadOnly && (
+        {isReadOnly ? (
           <CardAction>
             <Button
-              className="h-8 gap-1.5 text-muted-foreground text-xs hover:text-foreground"
-              onClick={handleReset}
+              className="h-8 gap-1.5 text-xs"
+              render={<Link to="/" />}
               size="sm"
-              variant="ghost"
+              variant="outline"
             >
-              <RotateCcw className="h-3.5 w-3.5" />
-              New image
+              New recipe
             </Button>
           </CardAction>
+        ) : (
+          preview &&
+          isDone && (
+            <CardAction>
+              <Button
+                className="h-8 gap-1.5 text-muted-foreground text-xs hover:text-foreground"
+                onClick={handleReset}
+                size="sm"
+                variant="ghost"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                New image
+              </Button>
+            </CardAction>
+          )
         )}
       </CardHeader>
       <CardContent>
