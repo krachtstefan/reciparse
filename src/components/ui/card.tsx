@@ -20,6 +20,45 @@ function Card({
   );
 }
 
+function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      className={cn(
+        "group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] group-data-[size=sm]/card:px-4 [.border-b]:pb-6 group-data-[size=sm]/card:[.border-b]:pb-4",
+        className
+      )}
+      data-slot="card-header"
+      {...props}
+    />
+  );
+}
+
+function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      className={cn(
+        "font-medium text-base leading-normal group-data-[size=sm]/card:text-sm",
+        className
+      )}
+      data-slot="card-title"
+      {...props}
+    />
+  );
+}
+
+function CardAction({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      className={cn(
+        "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
+        className
+      )}
+      data-slot="card-action"
+      {...props}
+    />
+  );
+}
+
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -30,4 +69,4 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-export { Card, CardContent };
+export { Card, CardAction, CardContent, CardHeader, CardTitle };

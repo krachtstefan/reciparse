@@ -3,7 +3,13 @@
 import { Download, ScanText } from "lucide-react";
 import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { RecipeOutput } from "./recipe-output";
 import { RecipeSkeleton } from "./recipe-skeleton";
 import { useRecipeParser } from "./utils/use-recipe-parser";
@@ -38,31 +44,28 @@ export function ExtractedRecipePanel({ recipeId }: ExtractedRecipePanelProps) {
   }, [melaRecipe]);
 
   return (
-    <Card className="border-border bg-card">
-      <CardContent className="p-4 sm:p-6">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-medium text-foreground text-sm">
-            Extracted Recipe
-          </h2>
-          {isDone && (
-            <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1 font-medium text-green-600 text-xs">
-                <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
-                Complete
-              </span>
-              <Button
-                className="h-7 gap-1.5 text-xs"
-                onClick={handleDownload}
-                size="sm"
-                variant="outline"
-              >
-                <Download className="h-3.5 w-3.5" />
-                Download
-              </Button>
-            </div>
-          )}
-        </div>
-
+    <Card>
+      <CardHeader>
+        <CardTitle>Extracted Recipe</CardTitle>
+        {isDone && (
+          <CardAction className="flex items-center gap-2">
+            <span className="flex items-center gap-1 font-medium text-green-600 text-xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
+              Complete
+            </span>
+            <Button
+              className="h-7 gap-1.5 text-xs"
+              onClick={handleDownload}
+              size="sm"
+              variant="outline"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Download
+            </Button>
+          </CardAction>
+        )}
+      </CardHeader>
+      <CardContent>
         {isIdle && <IdlePlaceholder />}
 
         {isProcessing && <RecipeSkeleton />}

@@ -2,7 +2,13 @@
 
 import { RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { UploadDropzone } from "./upload-dropzone";
 import { useRecipeParser } from "./utils/use-recipe-parser";
 
@@ -26,11 +32,11 @@ export function SourceImagePanel({ recipeId }: SourceImagePanelProps) {
   } = useRecipeParser(recipeId);
   const showTips = !(preview || isReadOnly);
   return (
-    <Card className="border-border bg-card">
-      <CardContent className="p-4 sm:p-6">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-medium text-foreground text-sm">Source Image</h2>
-          {preview && isDone && !isReadOnly && (
+    <Card>
+      <CardHeader>
+        <CardTitle>Source Image</CardTitle>
+        {preview && isDone && !isReadOnly && (
+          <CardAction>
             <Button
               className="h-8 gap-1.5 text-muted-foreground text-xs hover:text-foreground"
               onClick={handleReset}
@@ -40,9 +46,10 @@ export function SourceImagePanel({ recipeId }: SourceImagePanelProps) {
               <RotateCcw className="h-3.5 w-3.5" />
               New image
             </Button>
-          )}
-        </div>
-
+          </CardAction>
+        )}
+      </CardHeader>
+      <CardContent>
         <UploadDropzone
           isReadOnly={isReadOnly}
           onClear={handleClear}
