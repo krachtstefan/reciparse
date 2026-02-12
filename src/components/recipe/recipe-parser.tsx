@@ -3,14 +3,12 @@
 import { ScanText } from "lucide-react";
 import { ExtractedRecipePanel } from "./extracted-recipe-panel";
 import { SourceImagePanel } from "./source-image-panel";
-import { TipsCard } from "./tips-card";
 
 type RecipeParserProps = {
   recipeId?: string;
 };
 
 export function RecipeParser({ recipeId }: RecipeParserProps) {
-  const showTips = !recipeId;
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
       <header className="mb-8 text-center">
@@ -27,11 +25,7 @@ export function RecipeParser({ recipeId }: RecipeParserProps) {
       </header>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="space-y-4">
-          <SourceImagePanel recipeId={recipeId} />
-          {showTips && <TipsCard />}
-        </div>
-
+        <SourceImagePanel recipeId={recipeId} />
         <ExtractedRecipePanel recipeId={recipeId} />
       </div>
     </div>
