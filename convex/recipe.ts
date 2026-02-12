@@ -21,10 +21,16 @@ export const getRecipes = query({
 
 export const getRecipe = query({
   args: {
-    recipeId: v.id("recipes"),
+    recipeId: v.string(),
   },
   handler: async (ctx, args) => {
-    const recipe = await ctx.db.get(args.recipeId);
+    const { recipeId } = args;
+    const idNormalized = ctx.db.normalizeId("recipes", recipeId);
+    if (!idNormalized) {
+      return null;
+    }
+
+    const recipe = await ctx.db.get(idNormalized);
     if (!recipe) {
       return null;
     }

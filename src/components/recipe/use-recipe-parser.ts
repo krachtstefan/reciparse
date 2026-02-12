@@ -7,7 +7,7 @@ import { useUploadImage } from "../../api/use-upload-image";
 
 type ParseState = "idle" | "uploading" | "processing" | "failed";
 
-export function useRecipeParser(routeRecipeId?: Id<"recipes">) {
+export function useRecipeParser(routeRecipeId?: string) {
   const navigate = useNavigate();
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);

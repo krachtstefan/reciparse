@@ -1,14 +1,13 @@
 "use client";
 
 import { ScanText } from "lucide-react";
-import type { Id } from "../../../convex/_generated/dataModel";
 import { ExtractedRecipePanel } from "./extracted-recipe-panel";
 import { SourceImagePanel } from "./source-image-panel";
 import { TipsCard } from "./tips-card";
 import { useRecipeParser } from "./use-recipe-parser";
 
 type RecipeParserProps = {
-  recipeId?: Id<"recipes">;
+  recipeId?: string;
 };
 
 export function RecipeParser({ recipeId }: RecipeParserProps) {
