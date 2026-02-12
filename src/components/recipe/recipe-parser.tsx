@@ -2,6 +2,7 @@
 
 import { Link } from "@tanstack/react-router";
 import { ScanText } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { ExtractedRecipePanel } from "./extracted-recipe-panel";
 import { SourceImagePanel } from "./source-image-panel";
 
@@ -12,7 +13,10 @@ type RecipeParserProps = {
 export function RecipeParser({ recipeId }: RecipeParserProps) {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-      <header className="mb-8 text-center">
+      <header className="relative mb-8 text-center">
+        <div className="absolute top-0 right-0">
+          <ThemeToggle />
+        </div>
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
           <ScanText className="h-6 w-6 text-primary" />
         </div>
