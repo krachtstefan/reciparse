@@ -20,11 +20,7 @@ export const getMelaRecipeFilename = (title?: string | null) => {
   return `${slug || "recipe"}.melarecipe`;
 };
 
-export const downloadFile = ({
-  data,
-  filename,
-  mimeType,
-}: DownloadFileOptions) => {
+const downloadFile = ({ data, filename, mimeType }: DownloadFileOptions) => {
   const blob = new Blob(Array.isArray(data) ? data : [data], {
     type: mimeType,
   });
