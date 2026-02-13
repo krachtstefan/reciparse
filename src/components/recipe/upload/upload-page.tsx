@@ -1,5 +1,3 @@
-"use client";
-
 import { LoaderCircle, RotateCcw, Sparkles } from "lucide-react";
 import { Layout } from "@/components/layout";
 import { UploadDropzone } from "@/components/recipe/upload/upload-dropzone";

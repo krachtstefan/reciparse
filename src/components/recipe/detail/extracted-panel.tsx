@@ -1,5 +1,3 @@
-"use client";
-
 import { useQuery } from "convex/react";
 import { Download, ScanText } from "lucide-react";
 import { useCallback } from "react";
