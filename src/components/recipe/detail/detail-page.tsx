@@ -1,5 +1,5 @@
+import { Header } from "../../header";
 import { ExtractedPanel } from "./extracted-panel";
-import { Header } from "./header";
 
 type DetailPageProps = {
   recipeId: string;

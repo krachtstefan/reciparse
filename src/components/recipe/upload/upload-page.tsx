@@ -1,7 +1,7 @@
 "use client";
 
 import { LoaderCircle, RotateCcw, Sparkles } from "lucide-react";
-import { Header } from "@/components/recipe/detail/header";
+import { Header } from "@/components/header";
 import { UploadDropzone } from "@/components/recipe/upload/upload-dropzone";
 import { useUpload } from "@/components/recipe/upload/use-upload";
 import { Button } from "@/components/ui/button";
