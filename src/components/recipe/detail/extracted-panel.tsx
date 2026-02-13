@@ -20,27 +20,27 @@ type ExtractedPanelProps = {
 
 export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
   const recipe = useQuery(api.recipe.getRecipe, { recipeId });
-  const melaRecipeResult = recipe?.melaRecipe?.result;
-  const recipeStatus = recipe?.status;
-  const isSuccess = melaRecipeResult?.status === "success";
-  const isDone = recipeStatus === "succeeded" && isSuccess;
+  const recipeResult = recipe?.melaRecipe?.result;
+
+  const isSuccess = recipe?.status === "succeeded";
   const isFailed =
-    recipeStatus === "failed" || melaRecipeResult?.status === "failed";
-  const isProcessing = !(isDone || isFailed);
+    recipeResult?.status === "failed" || recipe?.status === "failed";
+
+  const isProcessing = !(isSuccess || isFailed);
 
   const handleDownload = useCallback(() => {
-    if (!melaRecipeResult || melaRecipeResult.status !== "success") {
+    if (!recipeResult || recipeResult.status !== "success") {
       return;
     }
 
-    downloadMelaRecipe(melaRecipeResult);
-  }, [melaRecipeResult]);
+    downloadMelaRecipe(recipeResult);
+  }, [recipeResult]);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Extracted Recipe</CardTitle>
-        {isDone && (
+        {isSuccess && (
           <CardAction>
             <Button
               className="h-7 gap-1.5 text-xs"
@@ -57,9 +57,9 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
       <CardContent>
         {isProcessing && <Skeleton />}
 
-        {isDone && melaRecipeResult && (
+        {recipeResult?.status === "success" && (
           <div className="fade-in slide-in-from-bottom-2 animate-in duration-500">
-            <Output recipe={melaRecipeResult} />
+            <Output recipe={recipeResult} />
           </div>
         )}
 
