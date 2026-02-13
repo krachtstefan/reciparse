@@ -4,13 +4,13 @@ import { useCallback, useState } from "react";
 import { api } from "../../../../convex/_generated/api";
 import { useUploadImage } from "../../../api/use-upload-image";
 
-type ParseState = "idle" | "uploading" | "failed";
+type UploadStatus = "idle" | "uploading" | "failed";
 
 export function useUploadRecipe() {
   const navigate = useNavigate();
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [parseState, setParseState] = useState<ParseState>("idle");
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
 
   const generateUploadUrl = useMutation(api.recipe.generateUploadUrl);
   const createRecipe = useMutation(api.recipe.createRecipe);
@@ -20,7 +20,7 @@ export function useUploadRecipe() {
     (selectedFile: File, previewUrl: string) => {
       setPreview(previewUrl);
       setFile(selectedFile);
-      setParseState("idle");
+      setUploadStatus("idle");
     },
     []
   );
@@ -28,7 +28,7 @@ export function useUploadRecipe() {
   const handleClear = useCallback(() => {
     setPreview(null);
     setFile(null);
-    setParseState("idle");
+    setUploadStatus("idle");
   }, []);
 
   const handleParse = useCallback(async () => {
@@ -37,7 +37,7 @@ export function useUploadRecipe() {
     }
 
     try {
-      setParseState("uploading");
+      setUploadStatus("uploading");
 
       const uploadUrl = await generateUploadUrl();
       const result = await uploadImageMutation.mutateAsync({
@@ -53,13 +53,13 @@ export function useUploadRecipe() {
       });
     } catch (error) {
       console.error(error);
-      setParseState("failed");
+      setUploadStatus("failed");
     }
   }, [createRecipe, file, generateUploadUrl, navigate, uploadImageMutation]);
 
-  const isIdle = parseState === "idle";
-  const isProcessing = parseState === "uploading";
-  const isFailed = parseState === "failed";
+  const isIdle = uploadStatus === "idle";
+  const isProcessing = uploadStatus === "uploading";
+  const isFailed = uploadStatus === "failed";
 
   return {
     preview,
