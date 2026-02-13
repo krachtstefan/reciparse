@@ -20,7 +20,7 @@ type MelaRecipe = {
   link: string;
 };
 
-type RecipeOutputProps = {
+type OutputProps = {
   recipe: MelaRecipe;
 };
 
@@ -60,7 +60,7 @@ function parseInstructions(raw: string): string[] {
     .filter((l) => l !== "");
 }
 
-export function RecipeOutput({ recipe }: RecipeOutputProps) {
+export function Output({ recipe }: OutputProps) {
   const ingredientGroups = parseIngredients(recipe.ingredients);
   const steps = parseInstructions(recipe.instructions);
   const hasMultipleGroups = ingredientGroups.length > 1;

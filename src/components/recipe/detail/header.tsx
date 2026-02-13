@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ScanText } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-export function RecipeHeader() {
+export function Header() {
   return (
     <header className="relative mb-8 text-center">
       <div className="absolute top-0 right-0">

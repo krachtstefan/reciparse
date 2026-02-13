@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getMelaRecipeFilename } from "./recipe-download";
+import { getMelaRecipeFilename } from "./download";
 
 describe("getMelaRecipeFilename", () => {
   it("creates a slugged filename from the title", () => {

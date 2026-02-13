@@ -6,7 +6,7 @@ import { useUploadImage } from "../../../api/use-upload-image";
 
 type UploadStatus = "idle" | "uploading" | "failed";
 
-export function useUploadRecipe() {
+export function useUpload() {
   const navigate = useNavigate();
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);

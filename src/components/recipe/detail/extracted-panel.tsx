@@ -11,16 +11,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { api } from "../../../convex/_generated/api";
-import { RecipeOutput } from "./recipe-output";
-import { RecipeSkeleton } from "./recipe-skeleton";
-import { downloadMelaRecipe } from "./utils/recipe-download";
+import { api } from "../../../../convex/_generated/api";
+import { downloadMelaRecipe } from "./download";
+import { Output } from "./output";
+import { Skeleton } from "./skeleton";
 
-type ExtractedRecipePanelProps = {
+type ExtractedPanelProps = {
   recipeId: string;
 };
 
-export function ExtractedRecipePanel({ recipeId }: ExtractedRecipePanelProps) {
+export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
   const recipe = useQuery(api.recipe.getRecipe, { recipeId });
   const melaRecipe = useExtractedMelaRecipe(recipe);
   const recipeStatus = recipe?.status;
@@ -55,11 +55,11 @@ export function ExtractedRecipePanel({ recipeId }: ExtractedRecipePanelProps) {
         )}
       </CardHeader>
       <CardContent>
-        {isProcessing && <RecipeSkeleton />}
+        {isProcessing && <Skeleton />}
 
         {isDone && melaRecipe && (
           <div className="fade-in slide-in-from-bottom-2 animate-in duration-500">
-            <RecipeOutput recipe={melaRecipe} />
+            <Output recipe={melaRecipe} />
           </div>
         )}
 

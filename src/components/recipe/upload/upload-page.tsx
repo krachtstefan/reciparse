@@ -1,9 +1,9 @@
 "use client";
 
 import { LoaderCircle, RotateCcw, Sparkles } from "lucide-react";
-import { RecipeHeader } from "@/components/recipe/recipe-header";
-import { UploadDropzone } from "@/components/recipe/upload-dropzone";
-import { useUploadRecipe } from "@/components/recipe/utils/use-upload-recipe";
+import { Header } from "@/components/recipe/detail/header";
+import { UploadDropzone } from "@/components/recipe/upload/upload-dropzone";
+import { useUpload } from "@/components/recipe/upload/use-upload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -21,14 +21,14 @@ export function UploadPage() {
     handleImageSelect,
     handleClear,
     handleParse,
-  } = useUploadRecipe();
+  } = useUpload();
 
   const showTips = !preview;
   const showButton = preview && !isFailed;
 
   return (
     <div className="mx-auto w-full max-w-xl px-4 py-8 sm:px-6 lg:px-8">
-      <RecipeHeader />
+      <Header />
 
       <Card>
         <CardHeader>
