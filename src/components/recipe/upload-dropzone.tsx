@@ -25,7 +25,11 @@ export function UploadDropzone({
       }
       const reader = new FileReader();
       reader.onload = (e) => {
-        onImageSelect(file, e.target?.result as string);
+        const imageDataUrl = e.target?.result;
+        if (typeof imageDataUrl !== "string") {
+          return;
+        }
+        onImageSelect(file, imageDataUrl);
       };
       reader.readAsDataURL(file);
     },
