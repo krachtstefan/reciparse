@@ -2,7 +2,7 @@
 
 import { ImageIcon, Upload, X } from "lucide-react";
 import type React from "react";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 type UploadDropzoneProps = {
@@ -18,54 +18,45 @@ export function UploadDropzone({
 }: UploadDropzoneProps) {
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleFile = useCallback(
-    (file: File) => {
-      if (!file.type.startsWith("image/")) {
+  const handleFile = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const imageDataUrl = e.target?.result;
+      if (typeof imageDataUrl !== "string") {
         return;
       }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageDataUrl = e.target?.result;
-        if (typeof imageDataUrl !== "string") {
-          return;
-        }
-        onImageSelect(file, imageDataUrl);
-      };
-      reader.readAsDataURL(file);
-    },
-    [onImageSelect]
-  );
+      onImageSelect(file, imageDataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setIsDragOver(false);
-      const file = e.dataTransfer.files[0];
-      if (file) {
-        handleFile(file);
-      }
-    },
-    [handleFile]
-  );
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFile(file);
+    }
+  };
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(true);
-  }, []);
+  };
 
-  const handleDragLeave = useCallback(() => {
+  const handleDragLeave = () => {
     setIsDragOver(false);
-  }, []);
+  };
 
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        handleFile(file);
-      }
-    },
-    [handleFile]
-  );
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFile(file);
+    }
+  };
 
   if (preview) {
     return (
@@ -86,7 +77,7 @@ export function UploadDropzone({
           size="icon"
           variant="secondary"
         >
-          <X className="h-4 w-4" />
+          <X />
         </Button>
       </div>
     );
