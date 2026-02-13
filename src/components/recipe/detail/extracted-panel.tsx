@@ -22,19 +22,21 @@ type ExtractedPanelProps = {
 
 export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
   const recipe = useQuery(api.recipe.getRecipe, { recipeId });
-  const melaRecipe = recipe?.melaRecipe;
+  const melaRecipeResult = recipe?.melaRecipe?.result;
   const recipeStatus = recipe?.status;
-  const isDone = recipeStatus === "succeeded" && melaRecipe !== null;
-  const isFailed = recipeStatus === "failed";
+  const isSuccess = melaRecipeResult?.status === "success";
+  const isDone = recipeStatus === "succeeded" && isSuccess;
+  const isFailed =
+    recipeStatus === "failed" || melaRecipeResult?.status === "failed";
   const isProcessing = !(isDone || isFailed);
 
   const handleDownload = useCallback(() => {
-    if (!melaRecipe) {
+    if (!melaRecipeResult || melaRecipeResult.status !== "success") {
       return;
     }
 
-    downloadMelaRecipe(melaRecipe);
-  }, [melaRecipe]);
+    downloadMelaRecipe(melaRecipeResult);
+  }, [melaRecipeResult]);
 
   return (
     <Card>
@@ -57,9 +59,9 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
       <CardContent>
         {isProcessing && <Skeleton />}
 
-        {isDone && melaRecipe && (
+        {isDone && melaRecipeResult && (
           <div className="fade-in slide-in-from-bottom-2 animate-in duration-500">
-            <Output recipe={melaRecipe} />
+            <Output recipe={melaRecipeResult} />
           </div>
         )}
 

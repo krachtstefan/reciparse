@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
 type MelaRecipe = {
+  status: "success";
   id: string;
   title: string;
   text: string;
