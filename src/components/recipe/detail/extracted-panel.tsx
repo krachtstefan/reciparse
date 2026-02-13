@@ -2,7 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { Download, ScanText } from "lucide-react";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,7 +22,7 @@ type ExtractedPanelProps = {
 
 export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
   const recipe = useQuery(api.recipe.getRecipe, { recipeId });
-  const melaRecipe = useExtractedMelaRecipe(recipe);
+  const melaRecipe = recipe?.melaRecipe;
   const recipeStatus = recipe?.status;
   const isDone = recipeStatus === "succeeded" && melaRecipe !== null;
   const isFailed = recipeStatus === "failed";
@@ -67,12 +67,6 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
       </CardContent>
     </Card>
   );
-}
-
-type RecipeQueryResult = typeof api.recipe.getRecipe._returnType;
-
-function useExtractedMelaRecipe(recipe?: RecipeQueryResult | null) {
-  return useMemo(() => recipe?.melaRecipe ?? null, [recipe?.melaRecipe]);
 }
 
 function FailedPlaceholder() {
