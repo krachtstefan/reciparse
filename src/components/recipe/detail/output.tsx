@@ -2,27 +2,10 @@ import { ChefHat, Clock, Flame, Users, UtensilsCrossed } from "lucide-react";
 import type React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-
-type MelaRecipe = {
-  status: "success";
-  id: string;
-  title: string;
-  text: string;
-  images: string[];
-  categories: string[];
-  yield: string;
-  prepTime: string;
-  cookTime: string;
-  totalTime: string;
-  ingredients: string;
-  instructions: string;
-  notes: string;
-  nutrition: string;
-  link: string;
-};
+import type { MelaRecipeFields } from "../../../../convex/helper";
 
 type OutputProps = {
-  recipe: MelaRecipe;
+  recipe: MelaRecipeFields;
 };
 
 type IngredientGroup = {

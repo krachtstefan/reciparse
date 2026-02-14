@@ -2,7 +2,7 @@ import type { Infer } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
 import type { melaRecipeFieldsValidator } from "./validators/recipe";
 
-type MelaRecipeFields = Infer<typeof melaRecipeFieldsValidator>;
+export type MelaRecipeFields = Infer<typeof melaRecipeFieldsValidator>;
 
 type BaseRecipe = {
   id: string;
