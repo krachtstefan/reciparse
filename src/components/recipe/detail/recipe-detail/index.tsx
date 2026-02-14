@@ -14,8 +14,8 @@ type RecipeDetailProps = {
 export function RecipeDetail({ recipe }: RecipeDetailProps) {
   const hasMeta =
     recipe.prepTime || recipe.cookTime || recipe.yield || recipe.totalTime;
-  const hasIngredients = recipe.ingredients;
-  const hasInstructions = recipe.instructions;
+  const hasIngredients = Boolean(recipe.ingredients?.trim()?.length);
+  const hasInstructions = Boolean(recipe.instructions?.trim()?.length);
 
   return (
     <div className="space-y-6">
