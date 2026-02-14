@@ -21,7 +21,7 @@ export function IngredientList({ ingredients }: IngredientListProps) {
   return (
     <div>
       <h3 className="flex items-center gap-2 font-serif text-foreground text-lg">
-        <UtensilsCrossed className="h-4 w-4 text-primary" />
+        <UtensilsCrossed className="size-4 text-primary" />
         Ingredients
       </h3>
       <div className="mt-3 space-y-4">
@@ -59,7 +59,7 @@ function IngredientGroupSection({
             className="flex items-start gap-2 text-foreground text-sm leading-relaxed"
             key={item}
           >
-            <span className="mt-2 block h-1 w-1 flex-shrink-0 rounded-full bg-primary" />
+            <span className="mt-2 block size-1 flex-shrink-0 rounded-full bg-primary" />
             {item}
           </li>
         ))}

@@ -46,7 +46,7 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
               size="sm"
               variant="outline"
             >
-              <Download className="h-3.5 w-3.5" />
+              <Download className="size-3.5" />
               Download
             </Button>
           </CardAction>
@@ -70,8 +70,8 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
 function FailedPlaceholder() {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
-        <ScanText className="h-6 w-6 text-destructive" />
+      <div className="flex size-14 items-center justify-center rounded-full bg-destructive/10">
+        <ScanText className="size-6 text-destructive" />
       </div>
       <p className="mt-4 text-destructive text-sm">
         Failed to extract recipe from image.

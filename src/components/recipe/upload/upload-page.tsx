@@ -48,7 +48,7 @@ export function UploadPage() {
                     className="flex items-start gap-2 text-muted-foreground text-xs leading-relaxed"
                     key={tip}
                   >
-                    <span className="mt-1.5 block h-1 w-1 flex-shrink-0 rounded-full bg-primary/60" />
+                    <span className="mt-1.5 block size-1 flex-shrink-0 rounded-full bg-primary/60" />
                     {tip}
                   </li>
                 ))}
@@ -91,7 +91,7 @@ function FailedIndicator({ onClear }: { onClear: () => void }) {
         Something went wrong while processing the recipe.
       </p>
       <Button className="w-full gap-2" onClick={onClear} variant="outline">
-        <RotateCcw className="h-4 w-4" />
+        <RotateCcw className="size-4" />
         Try Again
       </Button>
     </div>

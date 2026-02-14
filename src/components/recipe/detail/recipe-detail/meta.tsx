@@ -33,28 +33,28 @@ export function RecipeMeta({ recipe }: RecipeMetaProps) {
   const metaCards = [
     recipe.prepTime
       ? {
-          icon: <Clock className="h-4 w-4" />,
+          icon: <Clock className="size-4" />,
           label: "Prep",
           value: recipe.prepTime,
         }
       : undefined,
     recipe.cookTime
       ? {
-          icon: <Flame className="h-4 w-4" />,
+          icon: <Flame className="size-4" />,
           label: "Cook",
           value: recipe.cookTime,
         }
       : undefined,
     recipe.yield
       ? {
-          icon: <Users className="h-4 w-4" />,
+          icon: <Users className="size-4" />,
           label: "Yield",
           value: recipe.yield,
         }
       : undefined,
     recipe.totalTime
       ? {
-          icon: <ChefHat className="h-4 w-4" />,
+          icon: <ChefHat className="size-4" />,
           label: "Total",
           value: recipe.totalTime,
         }

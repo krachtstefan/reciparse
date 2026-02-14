@@ -13,8 +13,8 @@ export function Layout({ children }: LayoutProps) {
         <div className="absolute top-0 right-0">
           <ThemeToggle />
         </div>
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-          <ScanText className="h-6 w-6 text-primary" />
+        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/10">
+          <ScanText className="size-6 text-primary" />
         </div>
         <h1 className="text-balance font-serif text-3xl text-foreground sm:text-4xl">
           <Link className="hover:text-foreground" to="/">

@@ -100,14 +100,14 @@ export function UploadDropzone({
         type="file"
       />
       <div
-        className={`flex h-14 w-14 items-center justify-center rounded-full transition-colors ${
+        className={`flex size-14 items-center justify-center rounded-full transition-colors ${
           isDragOver ? "bg-primary/10" : "bg-muted"
         }`}
       >
         {isDragOver ? (
-          <Upload className="h-6 w-6 text-primary" />
+          <Upload className="size-6 text-primary" />
         ) : (
-          <ImageIcon className="h-6 w-6 text-muted-foreground" />
+          <ImageIcon className="size-6 text-muted-foreground" />
         )}
       </div>
       <div className="text-center">
