@@ -7,10 +7,7 @@ import {
   internalMutation,
   internalQuery,
 } from "../_generated/server";
-import {
-  melaRecipeValidator,
-  recipeStatusValidator,
-} from "../validators/recipe";
+import { melaRecipeValidator } from "../validators/recipe";
 import { DEFAULT_MODEL, openrouter } from "./helper";
 import { workflow } from "./index";
 
@@ -72,11 +69,6 @@ export const generateHeadlineWorkflow = workflow.define({
       { recipeId: args.recipeId }
     );
 
-    await step.runMutation(internal.workflow.recipe.updateRecipeStatus, {
-      recipeId: args.recipeId,
-      status: "in_progress",
-    });
-
     try {
       const melaRecipe = await step.runAction(
         internal.workflow.recipe.generateMelaRecipeFromImage,
@@ -92,10 +84,21 @@ export const generateHeadlineWorkflow = workflow.define({
         }
       );
     } catch (error) {
-      await step.runMutation(internal.workflow.recipe.updateRecipeStatus, {
-        recipeId: args.recipeId,
-        status: "failed",
-      });
+      await step.runMutation(
+        internal.workflow.recipe.updateRecipeFromWorkflow,
+        {
+          recipeId: args.recipeId,
+          melaRecipe: {
+            result: {
+              status: "failed",
+              reason:
+                error instanceof Error
+                  ? error.message
+                  : "Unknown error occurred",
+            },
+          },
+        }
+      );
       throw error;
     }
   },
@@ -186,19 +189,6 @@ export const updateRecipeFromWorkflow = internalMutation({
   handler: async (ctx, args) => {
     await ctx.db.patch(args.recipeId, {
       melaRecipe: args.melaRecipe,
-      status: "succeeded",
-    });
-  },
-});
-
-export const updateRecipeStatus = internalMutation({
-  args: {
-    recipeId: v.id("recipes"),
-    status: recipeStatusValidator,
-  },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.recipeId, {
-      status: args.status,
     });
   },
 });

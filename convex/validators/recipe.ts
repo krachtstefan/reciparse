@@ -29,10 +29,3 @@ export const melaRecipeValidator = v.object({
     })
   ),
 });
-
-export const recipeStatusValidator = v.union(
-  v.literal("pending"),
-  v.literal("in_progress"),
-  v.literal("succeeded"),
-  v.literal("failed")
-);

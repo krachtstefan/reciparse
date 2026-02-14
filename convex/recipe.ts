@@ -56,7 +56,6 @@ export const createRecipe = mutation({
   handler: async (ctx, args) => {
     const recipeId = await ctx.db.insert("recipes", {
       imageId: args.imageId,
-      status: "pending",
     });
 
     await workflow.start(
