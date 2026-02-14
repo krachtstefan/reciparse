@@ -1,5 +1,5 @@
 import { useQuery } from "convex/react";
-import { Download, ScanText } from "lucide-react";
+import { Download, FileX, ScanText } from "lucide-react";
 import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +21,8 @@ type ExtractedPanelProps = {
 export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
   const recipe = useQuery(api.recipe.getRecipe, { recipeId });
 
+  const isNotFound = recipe === null;
+
   const isSuccess = recipe?.status === "succeeded";
   const isFailed = recipe?.status === "failed";
 
@@ -33,6 +35,19 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
 
     downloadMelaRecipe(recipe.melaRecipe.result);
   }, [recipe]);
+
+  if (isNotFound) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Extracted Recipe</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <NotFoundPlaceholder />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -64,6 +79,17 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
         {isFailed && <FailedPlaceholder />}
       </CardContent>
     </Card>
+  );
+}
+
+function NotFoundPlaceholder() {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-center">
+      <div className="flex size-14 items-center justify-center rounded-full bg-muted">
+        <FileX className="size-6 text-muted-foreground" />
+      </div>
+      <p className="mt-4 text-muted-foreground text-sm">Recipe not found</p>
+    </div>
   );
 }
 
