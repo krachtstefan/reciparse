@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 
-const melaRecipeFieldsValidator = v.object({
+export const melaRecipeFieldsValidator = v.object({
   id: v.string(),
   title: v.string(),
   text: v.string(),
