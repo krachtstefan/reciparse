@@ -1,5 +1,6 @@
 import { ChefHat, Clock, Flame, Users } from "lucide-react";
 import type React from "react";
+import type { JSX } from "react";
 import type { MelaRecipeFields } from "../../../../../convex/helper";
 
 type MetaCardProps = {
@@ -22,33 +23,43 @@ type RecipeMetaProps = {
   recipe: MelaRecipeFields;
 };
 
+type MetaCard = {
+  icon: JSX.Element;
+  label: string;
+  value: string;
+};
+
 export function RecipeMeta({ recipe }: RecipeMetaProps) {
   const metaCards = [
-    recipe.prepTime && {
-      icon: <Clock className="h-4 w-4" />,
-      label: "Prep",
-      value: recipe.prepTime,
-    },
-    recipe.cookTime && {
-      icon: <Flame className="h-4 w-4" />,
-      label: "Cook",
-      value: recipe.cookTime,
-    },
-    recipe.yield && {
-      icon: <Users className="h-4 w-4" />,
-      label: "Yield",
-      value: recipe.yield,
-    },
-    recipe.totalTime && {
-      icon: <ChefHat className="h-4 w-4" />,
-      label: "Total",
-      value: recipe.totalTime,
-    },
-  ].filter(Boolean) as {
-    icon: React.ReactNode;
-    label: string;
-    value: string;
-  }[];
+    recipe.prepTime
+      ? {
+          icon: <Clock className="h-4 w-4" />,
+          label: "Prep",
+          value: recipe.prepTime,
+        }
+      : undefined,
+    recipe.cookTime
+      ? {
+          icon: <Flame className="h-4 w-4" />,
+          label: "Cook",
+          value: recipe.cookTime,
+        }
+      : undefined,
+    recipe.yield
+      ? {
+          icon: <Users className="h-4 w-4" />,
+          label: "Yield",
+          value: recipe.yield,
+        }
+      : undefined,
+    recipe.totalTime
+      ? {
+          icon: <ChefHat className="h-4 w-4" />,
+          label: "Total",
+          value: recipe.totalTime,
+        }
+      : undefined,
+  ].filter((item): item is MetaCard => Boolean(item));
 
   if (metaCards.length === 0) {
     return null;
