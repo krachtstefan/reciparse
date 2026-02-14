@@ -19,6 +19,30 @@ export const getRecipes = query({
   },
 });
 
+export const getRecipe = query({
+  args: {
+    recipeId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { recipeId } = args;
+    const idNormalized = ctx.db.normalizeId("recipes", recipeId);
+    if (!idNormalized) {
+      return null;
+    }
+
+    const recipe = await ctx.db.get(idNormalized);
+    if (!recipe) {
+      return null;
+    }
+
+    const imageUrl = recipe.imageId
+      ? await ctx.storage.getUrl(recipe.imageId)
+      : null;
+
+    return serializeRecipe(recipe, imageUrl);
+  },
+});
+
 export const generateUploadUrl = mutation({
   handler: async (ctx) => {
     return await ctx.storage.generateUploadUrl();
@@ -32,7 +56,6 @@ export const createRecipe = mutation({
   handler: async (ctx, args) => {
     const recipeId = await ctx.db.insert("recipes", {
       imageId: args.imageId,
-      status: "pending",
     });
 
     await workflow.start(
@@ -42,5 +65,7 @@ export const createRecipe = mutation({
         recipeId,
       }
     );
+
+    return recipeId;
   },
 });

@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 
-export const melaRecipeValidator = v.object({
+export const melaRecipeFieldsValidator = v.object({
   id: v.string(),
   title: v.string(),
   text: v.string(),
@@ -17,9 +17,15 @@ export const melaRecipeValidator = v.object({
   link: v.string(),
 });
 
-export const recipeStatusValidator = v.union(
-  v.literal("pending"),
-  v.literal("in_progress"),
-  v.literal("succeeded"),
-  v.literal("failed")
-);
+export const melaRecipeValidator = v.object({
+  result: v.union(
+    v.object({
+      status: v.literal("success"),
+      ...melaRecipeFieldsValidator.fields,
+    }),
+    v.object({
+      status: v.literal("failed"),
+      reason: v.string(),
+    })
+  ),
+});
