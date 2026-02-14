@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { api } from "../../../../convex/_generated/api";
 import { downloadMelaRecipe } from "./download";
-import { Output } from "./output";
+import { RecipeDetail } from "./recipe-detail";
 import { Skeleton } from "./skeleton";
 
 type ExtractedPanelProps = {
@@ -57,7 +57,7 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
 
         {isSuccess && (
           <div className="fade-in slide-in-from-bottom-2 animate-in duration-500">
-            <Output recipe={recipe.melaRecipe.result} />
+            <RecipeDetail recipe={recipe.melaRecipe.result} />
           </div>
         )}
 
