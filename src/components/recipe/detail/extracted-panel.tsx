@@ -1,16 +1,7 @@
 import { useQuery } from "convex/react";
-import { Download, FileX, ScanText } from "lucide-react";
-import { useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { FileX, ScanText } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "../../../../convex/_generated/api";
-import { downloadMelaRecipe } from "./download";
 import { RecipeDetail } from "./recipe-detail";
 import { Skeleton } from "./skeleton";
 
@@ -27,14 +18,6 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
   const isFailed = recipe?.status === "failed";
 
   const isProcessing = !(isSuccess || isFailed);
-
-  const handleDownload = useCallback(() => {
-    if (recipe?.status !== "succeeded") {
-      return;
-    }
-
-    downloadMelaRecipe(recipe.melaRecipe.result);
-  }, [recipe]);
 
   if (isNotFound) {
     return (
@@ -53,26 +36,13 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
     <Card>
       <CardHeader>
         <CardTitle>Extracted Recipe</CardTitle>
-        {isSuccess && (
-          <CardAction>
-            <Button
-              className="h-7 gap-1.5 text-xs"
-              onClick={handleDownload}
-              size="sm"
-              variant="outline"
-            >
-              <Download className="size-3.5" />
-              Download
-            </Button>
-          </CardAction>
-        )}
       </CardHeader>
       <CardContent>
         {isProcessing && <Skeleton />}
 
         {isSuccess && (
           <div className="fade-in slide-in-from-bottom-2 animate-in duration-500">
-            <RecipeDetail recipe={recipe.melaRecipe.result} />
+            <RecipeDetail recipe={recipe.recipeSchema.result} />
           </div>
         )}
 

@@ -1,8 +1,10 @@
 import type { Infer } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
-import type { melaRecipeFieldsValidator } from "./validators/recipe";
+import type { schemaOrgRecipeFieldsValidator } from "./validators/recipe";
 
-export type MelaRecipeFields = Infer<typeof melaRecipeFieldsValidator>;
+export type SchemaOrgRecipeFields = Infer<
+  typeof schemaOrgRecipeFieldsValidator
+>;
 
 type BaseRecipe = {
   id: string;
@@ -13,7 +15,7 @@ export type SerializedRecipe =
   | (BaseRecipe & { status: "pending" })
   | (BaseRecipe & {
       status: "succeeded";
-      melaRecipe: { result: { status: "success" } & MelaRecipeFields };
+      recipeSchema: { result: { status: "success" } & SchemaOrgRecipeFields };
     })
   | (BaseRecipe & { status: "failed"; reason: string });
 
@@ -21,7 +23,7 @@ export const serializeRecipe = (
   recipe: Doc<"recipes">,
   imageUrl: string | null
 ): SerializedRecipe => {
-  if (!recipe.melaRecipe) {
+  if (!recipe.recipeSchema) {
     return {
       id: recipe._id,
       imageUrl,
@@ -29,13 +31,13 @@ export const serializeRecipe = (
     };
   }
 
-  if (recipe.melaRecipe.result.status === "success") {
+  if (recipe.recipeSchema.result.status === "success") {
     return {
       id: recipe._id,
       imageUrl,
       status: "succeeded",
-      melaRecipe: recipe.melaRecipe as {
-        result: { status: "success" } & MelaRecipeFields;
+      recipeSchema: recipe.recipeSchema as {
+        result: { status: "success" } & SchemaOrgRecipeFields;
       },
     };
   }
@@ -44,6 +46,6 @@ export const serializeRecipe = (
     id: recipe._id,
     imageUrl,
     status: "failed",
-    reason: recipe.melaRecipe.result.reason,
+    reason: recipe.recipeSchema.result.reason,
   };
 };

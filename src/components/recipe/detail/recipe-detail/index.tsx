@@ -1,5 +1,5 @@
 import { Separator } from "@/components/ui/separator";
-import type { MelaRecipeFields } from "../../../../../convex/helper";
+import type { SchemaOrgRecipeFields } from "../../../../../convex/helper";
 import { RecipeHeader } from "./header";
 import { IngredientList } from "./ingredients";
 import { InstructionList } from "./instructions";
@@ -8,14 +8,17 @@ import { RecipeNotes } from "./notes";
 import { RecipeNutrition } from "./nutrition";
 
 type RecipeDetailProps = {
-  recipe: MelaRecipeFields;
+  recipe: SchemaOrgRecipeFields;
 };
 
 export function RecipeDetail({ recipe }: RecipeDetailProps) {
   const hasMeta =
-    recipe.prepTime || recipe.cookTime || recipe.yield || recipe.totalTime;
-  const hasIngredients = Boolean(recipe.ingredients?.trim()?.length);
-  const hasInstructions = Boolean(recipe.instructions?.trim()?.length);
+    recipe.prepTime ||
+    recipe.cookTime ||
+    recipe.recipeYield ||
+    recipe.totalTime;
+  const hasIngredients = recipe.recipeIngredient.length > 0;
+  const hasInstructions = recipe.recipeInstructions.length > 0;
 
   return (
     <div className="space-y-6">
@@ -31,28 +34,28 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
       {hasIngredients && (
         <>
           <Separator />
-          <IngredientList ingredients={recipe.ingredients} />
+          <IngredientList ingredients={recipe.recipeIngredient} />
         </>
       )}
 
       {hasInstructions && (
         <>
           <Separator />
-          <InstructionList instructions={recipe.instructions} />
+          <InstructionList instructions={recipe.recipeInstructions} />
         </>
       )}
 
-      {recipe.notes && (
+      {recipe.comment.text && (
         <>
           <Separator />
-          <RecipeNotes notes={recipe.notes} />
+          <RecipeNotes notes={recipe.comment.text} />
         </>
       )}
 
-      {recipe.nutrition && (
+      {recipe.nutrition.description && (
         <>
           <Separator />
-          <RecipeNutrition nutrition={recipe.nutrition} />
+          <RecipeNutrition nutrition={recipe.nutrition.description} />
         </>
       )}
     </div>

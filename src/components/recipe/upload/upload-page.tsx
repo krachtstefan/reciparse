@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const TIPS = [
   "Make sure the text is clearly readable in the image",
+  "Upload images where the text reads horizontally",
   "Works with cookbook pages, handwritten cards, and screenshots",
   "Make sure the image(s) only show one recipe",
 ] as const;

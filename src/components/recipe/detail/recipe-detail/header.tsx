@@ -1,33 +1,19 @@
-import { Badge } from "@/components/ui/badge";
-import type { MelaRecipeFields } from "../../../../../convex/helper";
+import type { SchemaOrgRecipeFields } from "../../../../../convex/helper";
 
 type RecipeHeaderProps = {
-  recipe: MelaRecipeFields;
+  recipe: SchemaOrgRecipeFields;
 };
 
 export function RecipeHeader({ recipe }: RecipeHeaderProps) {
   return (
     <div>
       <h2 className="text-balance font-serif text-2xl text-foreground">
-        {recipe.title}
+        {recipe.name}
       </h2>
-      {recipe.text && (
+      {recipe.description && (
         <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
-          {recipe.text}
+          {recipe.description}
         </p>
-      )}
-      {recipe.categories.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {recipe.categories.map((cat) => (
-            <Badge
-              className="font-normal text-xs"
-              key={cat}
-              variant="secondary"
-            >
-              {cat}
-            </Badge>
-          ))}
-        </div>
       )}
     </div>
   );
