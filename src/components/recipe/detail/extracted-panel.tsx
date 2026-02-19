@@ -1,7 +1,14 @@
 import { useQuery } from "convex/react";
 import { FileX, ScanText } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { api } from "../../../../convex/_generated/api";
+import { CopyLinkButton } from "./copy-link-button";
 import { RecipeDetail } from "./recipe-detail";
 import { Skeleton } from "./skeleton";
 
@@ -24,6 +31,9 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
       <Card>
         <CardHeader>
           <CardTitle>Extracted Recipe</CardTitle>
+          <CardAction>
+            <CopyLinkButton />
+          </CardAction>
         </CardHeader>
         <CardContent>
           <NotFoundPlaceholder />
@@ -36,6 +46,9 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
     <Card>
       <CardHeader>
         <CardTitle>Extracted Recipe</CardTitle>
+        <CardAction>
+          <CopyLinkButton />
+        </CardAction>
       </CardHeader>
       <CardContent>
         {isProcessing && <Skeleton />}
