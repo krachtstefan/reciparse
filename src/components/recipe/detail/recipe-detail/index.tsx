@@ -12,11 +12,7 @@ type RecipeDetailProps = {
 };
 
 export function RecipeDetail({ recipe }: RecipeDetailProps) {
-  const hasMeta =
-    recipe.prepTime ||
-    recipe.cookTime ||
-    recipe.recipeYield ||
-    recipe.totalTime;
+  recipe.totalTime;
   const hasIngredients = recipe.recipeIngredient.length > 0;
   const hasInstructions = recipe.recipeInstructions.length > 0;
 
@@ -24,12 +20,8 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
     <div className="space-y-6">
       <RecipeHeader recipe={recipe} />
 
-      {hasMeta && (
-        <>
-          <Separator />
-          <RecipeMeta recipe={recipe} />
-        </>
-      )}
+      <Separator />
+      <RecipeMeta recipe={recipe} />
 
       {hasIngredients && (
         <>

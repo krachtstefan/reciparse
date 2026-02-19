@@ -1,6 +1,5 @@
 import { ChefHat, Clock, Flame, Users } from "lucide-react";
 import type React from "react";
-import type { JSX } from "react";
 import type { SchemaOrgRecipeFields } from "../../../../../convex/helper";
 
 type MetaCardProps = {
@@ -23,47 +22,29 @@ type RecipeMetaProps = {
   recipe: SchemaOrgRecipeFields;
 };
 
-type MetaCardItem = {
-  icon: JSX.Element;
-  label: string;
-  value: string;
-};
-
 export function RecipeMeta({ recipe }: RecipeMetaProps) {
   const metaCards = [
-    recipe.prepTime
-      ? {
-          icon: <Clock className="size-4" />,
-          label: "Prep",
-          value: recipe.prepTime,
-        }
-      : undefined,
-    recipe.cookTime
-      ? {
-          icon: <Flame className="size-4" />,
-          label: "Cook",
-          value: recipe.cookTime,
-        }
-      : undefined,
-    recipe.recipeYield
-      ? {
-          icon: <Users className="size-4" />,
-          label: "Yield",
-          value: recipe.recipeYield,
-        }
-      : undefined,
-    recipe.totalTime
-      ? {
-          icon: <ChefHat className="size-4" />,
-          label: "Total",
-          value: recipe.totalTime,
-        }
-      : undefined,
-  ].filter((item): item is MetaCardItem => Boolean(item));
-
-  if (metaCards.length === 0) {
-    return null;
-  }
+    {
+      icon: <Clock className="size-4" />,
+      label: "Prep",
+      value: recipe.prepTime || "-",
+    },
+    {
+      icon: <Flame className="size-4" />,
+      label: "Cook",
+      value: recipe.cookTime || "-",
+    },
+    {
+      icon: <Users className="size-4" />,
+      label: "Yield",
+      value: recipe.recipeYield || "-",
+    },
+    {
+      icon: <ChefHat className="size-4" />,
+      label: "Total",
+      value: recipe.totalTime || "-",
+    },
+  ];
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
