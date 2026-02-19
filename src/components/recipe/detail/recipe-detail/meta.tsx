@@ -1,6 +1,6 @@
+import type { SchemaOrgRecipeFields } from "convex/validators/recipe";
 import { ChefHat, Clock, Flame, Users } from "lucide-react";
 import type React from "react";
-import type { SchemaOrgRecipeFields } from "../../../../../convex/helper";
 import { formatDuration } from "./duration";
 
 type MetaCardProps = {

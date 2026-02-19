@@ -1,4 +1,4 @@
-import type { SchemaOrgRecipeFields } from "../../../../../convex/helper";
+import type { SchemaOrgRecipeFields } from "convex/validators/recipe";
 
 type RecipeHeaderProps = {
   recipe: SchemaOrgRecipeFields;

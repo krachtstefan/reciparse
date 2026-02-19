@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { type Infer, v } from "convex/values";
 
 export const schemaOrgRecipeFieldsValidator = v.object({
   context: v.string(),
@@ -28,6 +28,10 @@ export const schemaOrgRecipeFieldsValidator = v.object({
   }),
   url: v.string(),
 });
+
+export type SchemaOrgRecipeFields = Infer<
+  typeof schemaOrgRecipeFieldsValidator
+>;
 
 export const schemaOrgRecipeValidator = v.object({
   result: v.union(

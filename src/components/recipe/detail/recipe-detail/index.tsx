@@ -1,5 +1,5 @@
+import type { SchemaOrgRecipeFields } from "convex/validators/recipe";
 import { Separator } from "@/components/ui/separator";
-import type { SchemaOrgRecipeFields } from "../../../../../convex/helper";
 import { RecipeHeader } from "./header";
 import { IngredientList } from "./ingredients";
 import { InstructionList } from "./instructions";
