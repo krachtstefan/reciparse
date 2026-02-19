@@ -23,7 +23,7 @@ export function CopyLinkButton() {
       aria-label={isCopied ? "Link copied" : "Copy link"}
       onClick={handleCopy}
       size="sm"
-      variant="ghost"
+      variant="outline"
     >
       {isCopied ? <Check /> : <Link />}
       {isCopied ? "Copied!" : "Copy link"}
