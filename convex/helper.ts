@@ -6,42 +6,12 @@ export type SchemaOrgRecipeFields = Infer<
   typeof schemaOrgRecipeFieldsValidator
 >;
 
-type BaseRecipe = {
-  id: string;
-  imageUrl: string | null;
-};
-
-type RecipeSchema = Doc<"recipes">["recipeSchema"];
-
-type PendingRecipeSchema = {
-  result: { status: "pending" };
-};
-
-type SerializedRecipeSchema = PendingRecipeSchema | NonNullable<RecipeSchema>;
-
-export type SerializedRecipe = BaseRecipe & {
-  recipeSchema: SerializedRecipeSchema;
-};
-
-export const serializeRecipe = (
-  recipe: Doc<"recipes">,
-  imageUrl: string | null
-): SerializedRecipe => {
-  if (!recipe.recipeSchema) {
-    return {
-      id: recipe._id,
-      imageUrl,
-      recipeSchema: {
-        result: {
-          status: "pending",
-        },
-      },
-    };
-  }
-
+export const serializeRecipe = (recipe: Doc<"recipes">, imageUrl: string) => {
   return {
     id: recipe._id,
     imageUrl,
     recipeSchema: recipe.recipeSchema,
   };
 };
+
+export type SerializedRecipe = ReturnType<typeof serializeRecipe>;

@@ -32,6 +32,9 @@ export const schemaOrgRecipeFieldsValidator = v.object({
 export const schemaOrgRecipeValidator = v.object({
   result: v.union(
     v.object({
+      status: v.literal("pending"),
+    }),
+    v.object({
       status: v.literal("success"),
       ...schemaOrgRecipeFieldsValidator.fields,
     }),
