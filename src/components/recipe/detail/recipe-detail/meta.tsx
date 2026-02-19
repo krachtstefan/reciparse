@@ -1,6 +1,7 @@
 import { ChefHat, Clock, Flame, Users } from "lucide-react";
 import type React from "react";
 import type { SchemaOrgRecipeFields } from "../../../../../convex/helper";
+import { formatDuration } from "./duration";
 
 type MetaCardProps = {
   icon: React.ReactNode;
@@ -23,16 +24,18 @@ type RecipeMetaProps = {
 };
 
 export function RecipeMeta({ recipe }: RecipeMetaProps) {
+  const locale = recipe.inLanguage ?? "en";
+
   const metaCards = [
     {
       icon: <Clock className="size-4" />,
       label: "Prep",
-      value: recipe.prepTime || "-",
+      value: recipe.prepTime ? formatDuration(recipe.prepTime, locale) : "-",
     },
     {
       icon: <Flame className="size-4" />,
       label: "Cook",
-      value: recipe.cookTime || "-",
+      value: recipe.cookTime ? formatDuration(recipe.cookTime, locale) : "-",
     },
     {
       icon: <Users className="size-4" />,
@@ -42,7 +45,7 @@ export function RecipeMeta({ recipe }: RecipeMetaProps) {
     {
       icon: <ChefHat className="size-4" />,
       label: "Total",
-      value: recipe.totalTime || "-",
+      value: recipe.totalTime ? formatDuration(recipe.totalTime, locale) : "-",
     },
   ];
 

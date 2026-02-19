@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDuration } from "../../../convex/lib/duration";
+import { formatDuration } from "./duration";
 
 describe("formatDuration", () => {
   it("formats minutes", () => {

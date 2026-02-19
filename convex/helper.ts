@@ -1,6 +1,5 @@
 import type { Infer } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
-import { formatDuration } from "./lib/duration";
 import type { schemaOrgRecipeFieldsValidator } from "./validators/recipe";
 
 export type SchemaOrgRecipeFields = Infer<
@@ -33,26 +32,12 @@ export const serializeRecipe = (
   }
 
   if (recipe.recipeSchema.result.status === "success") {
-    const result = recipe.recipeSchema.result;
-    const locale = result.inLanguage ?? "en";
-
     return {
       id: recipe._id,
       imageUrl,
       status: "succeeded",
-      recipeSchema: {
-        result: {
-          ...result,
-          prepTime: result.prepTime
-            ? formatDuration(result.prepTime, locale)
-            : "",
-          cookTime: result.cookTime
-            ? formatDuration(result.cookTime, locale)
-            : "",
-          totalTime: result.totalTime
-            ? formatDuration(result.totalTime, locale)
-            : "",
-        },
+      recipeSchema: recipe.recipeSchema as {
+        result: { status: "success" } & SchemaOrgRecipeFields;
       },
     };
   }

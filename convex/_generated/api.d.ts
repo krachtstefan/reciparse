@@ -9,7 +9,6 @@
  */
 
 import type * as helper from "../helper.js";
-import type * as lib_duration from "../lib/duration.js";
 import type * as recipe from "../recipe.js";
 import type * as validators_recipe from "../validators/recipe.js";
 import type * as workflow_helper from "../workflow/helper.js";
@@ -24,7 +23,6 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   helper: typeof helper;
-  "lib/duration": typeof lib_duration;
   recipe: typeof recipe;
   "validators/recipe": typeof validators_recipe;
   "workflow/helper": typeof workflow_helper;
