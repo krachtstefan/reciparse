@@ -25,6 +25,12 @@ const schemaOrgRecipeSchema = z.object({
           type: z.literal("Recipe").describe("Schema.org type"),
           name: z.string().min(1).describe("Recipe title"),
           description: z.string().describe("Short description of the recipe"),
+          inLanguage: z
+            .string()
+            .optional()
+            .describe(
+              "The language of the recipe content using IETF BCP 47 standard (e.g., 'en' for English, 'es' for Spanish, 'fr' for French). Used by Temporal API for localized duration formatting. If uncertain, default to 'en'."
+            ),
           image: z.array(z.string()).describe("Array of image URLs"),
           recipeYield: z.string().describe("Number of servings"),
           prepTime: z.string().describe("Preparation time (ISO 8601 duration)"),
@@ -138,7 +144,7 @@ export const generateSchemaOrgRecipeFromImage = internalAction({
             content: [
               {
                 type: "text",
-                text: "Extract recipe details from this image or screenshot and return a schema.org/Recipe JSON object.\n\nRequirements:\n- Only extract information that is explicitly visible in the image text; do not infer or invent recipe details from food photos.\n- Output only JSON, no markdown or code fences.\n- Keep the original language from the source.\n- Keep the original wording as much as possible.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- If multiple recipes are visible, extract only the most prominent one.\n",
+                text: "Extract recipe details from this image or screenshot and return a schema.org/Recipe JSON object.\n\nRequirements:\n- Only extract information that is explicitly visible in the image text; do not infer or invent recipe details from food photos.\n- Output only JSON, no markdown or code fences.\n- Keep the original language from the source.\n- Keep the original wording as much as possible.\n- Detect the language of the recipe (e.g., 'en' for English, 'es' for Spanish, 'fr' for French) and include it in the inLanguage field.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- If multiple recipes are visible, extract only the most prominent one.\n",
               },
               {
                 type: "image",

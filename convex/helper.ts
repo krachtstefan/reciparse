@@ -34,6 +34,7 @@ export const serializeRecipe = (
 
   if (recipe.recipeSchema.result.status === "success") {
     const result = recipe.recipeSchema.result;
+    const locale = result.inLanguage ?? "en";
 
     return {
       id: recipe._id,
@@ -43,13 +44,13 @@ export const serializeRecipe = (
         result: {
           ...result,
           prepTime: result.prepTime
-            ? formatDuration(result.prepTime, "en")
+            ? formatDuration(result.prepTime, locale)
             : "",
           cookTime: result.cookTime
-            ? formatDuration(result.cookTime, "en")
+            ? formatDuration(result.cookTime, locale)
             : "",
           totalTime: result.totalTime
-            ? formatDuration(result.totalTime, "en")
+            ? formatDuration(result.totalTime, locale)
             : "",
         },
       },

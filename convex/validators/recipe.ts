@@ -5,6 +5,7 @@ export const schemaOrgRecipeFieldsValidator = v.object({
   type: v.literal("Recipe"),
   name: v.string(),
   description: v.string(),
+  inLanguage: v.optional(v.string()),
   image: v.array(v.string()),
   recipeYield: v.string(),
   prepTime: v.string(),

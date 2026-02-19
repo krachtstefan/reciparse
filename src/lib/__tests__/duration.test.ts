@@ -28,6 +28,13 @@ describe("formatDuration", () => {
 
   it("uses specified locale", () => {
     expect(formatDuration("PT1H30M", "es")).toBe("1 h y 30 min");
+    expect(formatDuration("PT1H30M", "fr")).toBe("1\u202fh et 30\xa0min");
+    expect(formatDuration("PT1H30M", "de")).toBe("1 Std., 30 Min.");
+  });
+
+  it("supports full BCP 47 locale codes with region", () => {
+    // Test en-US - it should format successfully
+    expect(formatDuration("PT1H30M", "en-US")).toBe("1 hr, 30 min");
   });
 
   it("defaults to English locale", () => {
