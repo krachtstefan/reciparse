@@ -11,13 +11,17 @@ type BaseRecipe = {
   imageUrl: string | null;
 };
 
-export type SerializedRecipe =
-  | (BaseRecipe & { status: "pending" })
-  | (BaseRecipe & {
-      status: "succeeded";
-      recipeSchema: { result: { status: "success" } & SchemaOrgRecipeFields };
-    })
-  | (BaseRecipe & { status: "failed"; reason: string });
+type RecipeSchema = Doc<"recipes">["recipeSchema"];
+
+type PendingRecipeSchema = {
+  result: { status: "pending" };
+};
+
+type SerializedRecipeSchema = PendingRecipeSchema | NonNullable<RecipeSchema>;
+
+export type SerializedRecipe = BaseRecipe & {
+  recipeSchema: SerializedRecipeSchema;
+};
 
 export const serializeRecipe = (
   recipe: Doc<"recipes">,
@@ -27,17 +31,10 @@ export const serializeRecipe = (
     return {
       id: recipe._id,
       imageUrl,
-      status: "pending",
-    };
-  }
-
-  if (recipe.recipeSchema.result.status === "success") {
-    return {
-      id: recipe._id,
-      imageUrl,
-      status: "succeeded",
-      recipeSchema: recipe.recipeSchema as {
-        result: { status: "success" } & SchemaOrgRecipeFields;
+      recipeSchema: {
+        result: {
+          status: "pending",
+        },
       },
     };
   }
@@ -45,7 +42,6 @@ export const serializeRecipe = (
   return {
     id: recipe._id,
     imageUrl,
-    status: "failed",
-    reason: recipe.recipeSchema.result.reason,
+    recipeSchema: recipe.recipeSchema,
   };
 };

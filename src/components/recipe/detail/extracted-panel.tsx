@@ -21,8 +21,9 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
 
   const isNotFound = recipe === null;
 
-  const isSuccess = recipe?.status === "succeeded";
-  const isFailed = recipe?.status === "failed";
+  const recipeStatus = recipe?.recipeSchema?.result.status;
+  const isSuccess = recipeStatus === "success";
+  const isFailed = recipeStatus === "failed";
 
   const isProcessing = !(isSuccess || isFailed);
 
@@ -53,7 +54,7 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
       <CardContent>
         {isProcessing && <Skeleton />}
 
-        {isSuccess && (
+        {recipe?.recipeSchema.result.status === "success" && (
           <div className="fade-in slide-in-from-bottom-2 animate-in duration-500">
             <RecipeDetail recipe={recipe.recipeSchema.result} />
           </div>
