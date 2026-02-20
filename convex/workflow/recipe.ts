@@ -11,67 +11,74 @@ import { schemaOrgRecipeValidator } from "../validators/recipe";
 import { DEFAULT_MODEL, openrouter } from "./helper";
 import { workflow } from "./index";
 
-const schemaOrgRecipeSchema = z.object({
-  result: z
-    .union([
-      z
-        .object({
-          status: z
-            .literal("success")
-            .describe("The recipe was successfully extracted"),
-          context: z
-            .literal("https://schema.org")
-            .describe("Schema.org context URL"),
-          type: z.literal("Recipe").describe("Schema.org type"),
-          name: z.string().min(1).describe("Recipe title"),
-          description: z.string().describe("Short description of the recipe"),
-          inLanguage: z
-            .string()
-            .describe(
-              "The language of the recipe content using IETF BCP 47 standard (e.g., 'en' for English, 'es' for Spanish, 'fr' for French). Used by Temporal API for localized duration formatting. If uncertain, default to 'en'."
-            ),
-          image: z.array(z.string()).describe("Array of image URLs"),
-          recipeYield: z.string().describe("Number of servings"),
-          prepTime: z.string().describe("Preparation time (ISO 8601 duration)"),
-          cookTime: z.string().describe("Cooking time (ISO 8601 duration)"),
-          totalTime: z.string().describe("Total time (ISO 8601 duration)"),
-          recipeIngredient: z
-            .array(z.string())
-            .describe(
-              "List of ingredients, including quantities and units, e.g. '1 cup flour' or '2 eggs'"
-            ),
-          recipeInstructions: z
-            .array(
-              z.object({
-                type: z.literal("HowToStep"),
-                text: z.string().describe("Instruction step text"),
+const createSchemaOrgRecipeSchema = (imageUrl: string) =>
+  z.object({
+    result: z
+      .union([
+        z
+          .object({
+            status: z
+              .literal("success")
+              .describe("The recipe was successfully extracted"),
+            context: z
+              .literal("https://schema.org")
+              .describe("Schema.org context URL"),
+            type: z.literal("Recipe").describe("Schema.org type"),
+            name: z.string().min(1).describe("Recipe title"),
+            description: z.string().describe("Short description of the recipe"),
+            inLanguage: z
+              .string()
+              .describe(
+                "The language of the recipe content using IETF BCP 47 standard (e.g., 'en' for English, 'es' for Spanish, 'fr' for French). Used by Temporal API for localized duration formatting. If uncertain, default to 'en'."
+              ),
+            image: z
+              .array(z.literal(imageUrl))
+              .describe("Array of image URLs constrained to source image"),
+            recipeYield: z.string().describe("Number of servings"),
+            prepTime: z
+              .string()
+              .describe("Preparation time (ISO 8601 duration)"),
+            cookTime: z.string().describe("Cooking time (ISO 8601 duration)"),
+            totalTime: z.string().describe("Total time (ISO 8601 duration)"),
+            recipeIngredient: z
+              .array(z.string())
+              .describe(
+                "List of ingredients, including quantities and units, e.g. '1 cup flour' or '2 eggs'"
+              ),
+            recipeInstructions: z
+              .array(
+                z.object({
+                  type: z.literal("HowToStep"),
+                  text: z.string().describe("Instruction step text"),
+                })
+              )
+              .describe("Cooking instructions as HowToStep array"),
+            comment: z
+              .object({
+                type: z.literal("Comment"),
+                text: z.string().describe("Additional notes"),
               })
-            )
-            .describe("Cooking instructions as HowToStep array"),
-          comment: z
-            .object({
-              type: z.literal("Comment"),
-              text: z.string().describe("Additional notes"),
-            })
-            .describe("Recipe notes as Comment"),
-          nutrition: z
-            .object({
-              type: z.literal("NutritionInformation"),
-              description: z.string().describe("Nutritional information"),
-            })
-            .describe("Nutrition information"),
-          url: z.string().describe("Source URL of the recipe"),
-        })
-        .strict(),
-      z
-        .object({
-          status: z.literal("failed").describe("The recipe extraction failed"),
-          reason: z.string().describe("Reason for the failure"),
-        })
-        .strict(),
-    ])
-    .describe("The recipe extraction result in schema.org/Recipe format"),
-});
+              .describe("Recipe notes as Comment"),
+            nutrition: z
+              .object({
+                type: z.literal("NutritionInformation"),
+                description: z.string().describe("Nutritional information"),
+              })
+              .describe("Nutrition information"),
+            url: z.string().describe("Source URL of the recipe"),
+          })
+          .strict(),
+        z
+          .object({
+            status: z
+              .literal("failed")
+              .describe("The recipe extraction failed"),
+            reason: z.string().describe("Reason for the failure"),
+          })
+          .strict(),
+      ])
+      .describe("The recipe extraction result in schema.org/Recipe format"),
+  });
 
 export const generateHeadlineWorkflow = workflow.define({
   args: {
@@ -131,7 +138,9 @@ export const generateSchemaOrgRecipeFromImage = internalAction({
     try {
       const { output } = await generateText({
         model: openrouter(DEFAULT_MODEL),
-        output: Output.object({ schema: schemaOrgRecipeSchema }),
+        output: Output.object({
+          schema: createSchemaOrgRecipeSchema(args.imageUrl),
+        }),
         messages: [
           {
             role: "system",
