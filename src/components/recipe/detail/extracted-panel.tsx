@@ -10,6 +10,7 @@ import {
 import { api } from "../../../../convex/_generated/api";
 import { CopyLinkButton } from "./copy-link-button";
 import { RecipeDetail } from "./recipe-detail";
+import { RecipeJsonLd } from "./recipe-json-ld";
 import { Skeleton } from "./skeleton";
 
 type ExtractedPanelProps = {
@@ -56,6 +57,7 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
 
         {recipe?.recipeSchema.result.status === "success" && (
           <div className="fade-in slide-in-from-bottom-2 animate-in duration-500">
+            <RecipeJsonLd recipe={recipe.recipeSchema.result} />
             <RecipeDetail recipe={recipe.recipeSchema.result} />
           </div>
         )}
