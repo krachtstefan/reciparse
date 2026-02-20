@@ -1,7 +1,5 @@
 import { useQuery } from "convex/react";
-import { Download, FileX, ScanText } from "lucide-react";
-import { useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { FileX, ScanText } from "lucide-react";
 import {
   Card,
   CardAction,
@@ -10,8 +8,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { api } from "../../../../convex/_generated/api";
-import { downloadMelaRecipe } from "./download";
+import { CopyLinkButton } from "./copy-link-button";
 import { RecipeDetail } from "./recipe-detail";
+import { RecipeJsonLd } from "./recipe-json-ld";
 import { Skeleton } from "./skeleton";
 
 type ExtractedPanelProps = {
@@ -23,24 +22,20 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
 
   const isNotFound = recipe === null;
 
-  const isSuccess = recipe?.status === "succeeded";
-  const isFailed = recipe?.status === "failed";
+  const recipeStatus = recipe?.recipeSchema?.result.status;
+  const isSuccess = recipeStatus === "success";
+  const isFailed = recipeStatus === "failed";
 
   const isProcessing = !(isSuccess || isFailed);
-
-  const handleDownload = useCallback(() => {
-    if (recipe?.status !== "succeeded") {
-      return;
-    }
-
-    downloadMelaRecipe(recipe.melaRecipe.result);
-  }, [recipe]);
 
   if (isNotFound) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Extracted Recipe</CardTitle>
+          <CardAction>
+            <CopyLinkButton />
+          </CardAction>
         </CardHeader>
         <CardContent>
           <NotFoundPlaceholder />
@@ -53,26 +48,17 @@ export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
     <Card>
       <CardHeader>
         <CardTitle>Extracted Recipe</CardTitle>
-        {isSuccess && (
-          <CardAction>
-            <Button
-              className="h-7 gap-1.5 text-xs"
-              onClick={handleDownload}
-              size="sm"
-              variant="outline"
-            >
-              <Download className="size-3.5" />
-              Download
-            </Button>
-          </CardAction>
-        )}
+        <CardAction>
+          <CopyLinkButton />
+        </CardAction>
       </CardHeader>
       <CardContent>
         {isProcessing && <Skeleton />}
 
-        {isSuccess && (
+        {recipe?.recipeSchema.result.status === "success" && (
           <div className="fade-in slide-in-from-bottom-2 animate-in duration-500">
-            <RecipeDetail recipe={recipe.melaRecipe.result} />
+            <RecipeJsonLd recipe={recipe.recipeSchema.result} />
+            <RecipeDetail recipe={recipe.recipeSchema.result} />
           </div>
         )}
 

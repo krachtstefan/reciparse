@@ -94,6 +94,7 @@ Write code that is **accessible, performant, type-safe, and maintainable**. Focu
 
 **React 19+:**
 - Use ref as a prop instead of `React.forwardRef`
+- Avoid "use client" directive unless absolutely necessary (e.g., for hooks like useState, useEffect, or browser APIs)
 
 **Solid/Svelte/Vue/Qwik:**
 - Use `class` and `for` attributes (not `className` or `htmlFor`)
