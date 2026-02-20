@@ -27,7 +27,6 @@ const schemaOrgRecipeSchema = z.object({
           description: z.string().describe("Short description of the recipe"),
           inLanguage: z
             .string()
-            .optional()
             .describe(
               "The language of the recipe content using IETF BCP 47 standard (e.g., 'en' for English, 'es' for Spanish, 'fr' for French). Used by Temporal API for localized duration formatting. If uncertain, default to 'en'."
             ),
