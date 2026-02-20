@@ -1,4 +1,13 @@
 import type { SchemaOrgRecipeFields } from "convex/validators/recipe";
+import { ConditionalWrapper } from "@/components/conditional-wrapper";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
 
 type RecipeHeaderProps = {
   recipe: SchemaOrgRecipeFields;
@@ -9,6 +18,25 @@ export function RecipeHeader({ recipe }: RecipeHeaderProps) {
     new Set(recipe.image.filter((url) => Boolean(url)))
   );
   const hasImages = imageUrls.length > 0;
+  const hasMultipleImages = imageUrls.length > 1;
+
+  const imageChildren = (
+    <>
+      {imageUrls.map((imageUrl) => (
+        <ConditionalWrapper
+          condition={hasMultipleImages}
+          key={imageUrl}
+          wrapper={(children) => <CarouselItem>{children}</CarouselItem>}
+        >
+          <RecipeImage
+            className={cn(hasMultipleImages && "mx-12")}
+            imageUrl={imageUrl}
+            recipeName={recipe.name}
+          />
+        </ConditionalWrapper>
+      ))}
+    </>
+  );
 
   return (
     <div>
@@ -22,24 +50,44 @@ export function RecipeHeader({ recipe }: RecipeHeaderProps) {
       )}
 
       {hasImages && (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {imageUrls.map((imageUrl) => (
-            <div
-              className="overflow-hidden rounded-lg border border-border bg-muted/30"
-              key={imageUrl}
-            >
-              <img
-                alt={recipe.name ? `${recipe.name} image` : "Recipe image"}
-                className="h-auto max-h-[360px] w-full object-contain"
-                height={900}
-                loading="lazy"
-                src={imageUrl}
-                width={1200}
-              />
-            </div>
-          ))}
-        </div>
+        <ConditionalWrapper
+          condition={hasMultipleImages}
+          wrapper={(children) => (
+            <Carousel className="mx-12 mt-5">
+              <CarouselContent>{children}</CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          )}
+        >
+          {imageChildren}
+        </ConditionalWrapper>
       )}
+    </div>
+  );
+}
+
+type RecipeImageProps = {
+  imageUrl: string;
+  recipeName: string;
+  className?: string;
+};
+
+function RecipeImage({ imageUrl, recipeName, className }: RecipeImageProps) {
+  return (
+    <div
+      className={cn(
+        "mt-5 aspect-square overflow-hidden rounded-xl border border-border bg-muted/30",
+        className
+      )}
+    >
+      {/** biome-ignore lint/correctness/useImageSize: size is unknown */}
+      <img
+        alt={recipeName ? `${recipeName} image` : "Recipe image"}
+        className="h-full w-full object-contain"
+        loading="lazy"
+        src={imageUrl}
+      />
     </div>
   );
 }
