@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { formatDuration } from "../recipe-detail/duration";
+import {
+  formatDuration,
+  parseISO8601Duration,
+} from "../recipe-detail/duration";
 
 describe("formatDuration", () => {
   it("formats minutes", () => {
@@ -39,5 +42,67 @@ describe("formatDuration", () => {
 
   it("defaults to English locale", () => {
     expect(formatDuration("PT30M")).toBe("30 min");
+  });
+});
+
+describe("parseISO8601Duration", () => {
+  it("parses minutes only", () => {
+    expect(parseISO8601Duration("PT30M")).toEqual({
+      days: 0,
+      hours: 0,
+      minutes: 30,
+    });
+  });
+
+  it("parses hours only", () => {
+    expect(parseISO8601Duration("PT2H")).toEqual({
+      days: 0,
+      hours: 2,
+      minutes: 0,
+    });
+  });
+
+  it("parses days only", () => {
+    expect(parseISO8601Duration("P3D")).toEqual({
+      days: 3,
+      hours: 0,
+      minutes: 0,
+    });
+  });
+
+  it("parses hours and minutes", () => {
+    expect(parseISO8601Duration("PT1H30M")).toEqual({
+      days: 0,
+      hours: 1,
+      minutes: 30,
+    });
+  });
+
+  it("parses days and hours", () => {
+    expect(parseISO8601Duration("P1DT2H")).toEqual({
+      days: 1,
+      hours: 2,
+      minutes: 0,
+    });
+  });
+
+  it("parses all components", () => {
+    expect(parseISO8601Duration("P1DT5H30M")).toEqual({
+      days: 1,
+      hours: 5,
+      minutes: 30,
+    });
+  });
+
+  it("returns null for invalid input", () => {
+    expect(parseISO8601Duration("invalid")).toBeNull();
+    expect(parseISO8601Duration("1H30M")).toBeNull();
+    expect(parseISO8601Duration("")).toBeNull();
+  });
+
+  it("returns null for unsupported components (years, months, seconds)", () => {
+    expect(parseISO8601Duration("P1Y")).toBeNull();
+    expect(parseISO8601Duration("P1M")).toBeNull();
+    expect(parseISO8601Duration("PT30S")).toBeNull();
   });
 });
