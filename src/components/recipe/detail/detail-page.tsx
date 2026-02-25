@@ -1,14 +1,10 @@
 import { Layout } from "../../layout";
 import { ExtractedPanel } from "./extracted-panel";
 
-type DetailPageProps = {
-  recipeId: string;
-};
-
-export function DetailPage({ recipeId }: DetailPageProps) {
+export function DetailPage() {
   return (
     <Layout>
-      <ExtractedPanel recipeId={recipeId} />
+      <ExtractedPanel />
     </Layout>
   );
 }

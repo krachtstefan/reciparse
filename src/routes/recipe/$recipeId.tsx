@@ -1,54 +1,63 @@
+import { convexQuery } from "@convex-dev/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { DetailPage } from "@/components/recipe/detail/detail-page";
-
-const dummyRecipeJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Recipe",
-  name: "Classic Tomato Pasta",
-  description: "A quick and simple weeknight tomato pasta recipe.",
-  image: ["https://example.com/images/classic-tomato-pasta.jpg"],
-  recipeYield: "2 servings",
-  prepTime: "PT10M",
-  cookTime: "PT20M",
-  totalTime: "PT30M",
-  recipeIngredient: [
-    "200g dried pasta",
-    "2 tbsp olive oil",
-    "2 garlic cloves",
-    "400g canned tomatoes",
-    "Salt",
-    "Black pepper",
-  ],
-  recipeInstructions: [
-    {
-      "@type": "HowToStep",
-      text: "Boil pasta in salted water until al dente.",
-    },
-    {
-      "@type": "HowToStep",
-      text: "Saute garlic in olive oil, add tomatoes, and simmer.",
-    },
-    {
-      "@type": "HowToStep",
-      text: "Combine pasta with sauce and season to taste.",
-    },
-  ],
-} as const;
+import { api } from "../../../convex/_generated/api";
+import type { SerializedRecipe } from "../../../convex/helper";
 
 export const Route = createFileRoute("/recipe/$recipeId")({
-  head: () => ({
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify(dummyRecipeJsonLd),
-      },
-    ],
-  }),
-  component: RecipeDetail,
+  loader: async (opts) => {
+    const { recipeId } = opts.params;
+    const recipe = await opts.context.queryClient.ensureQueryData(
+      convexQuery(api.recipe.getRecipe, { recipeId })
+    );
+
+    return {
+      recipe,
+    };
+  },
+  head: ({ loaderData }) => {
+    const recipeJsonLd = toRecipeJsonLd(loaderData?.recipe);
+
+    if (!recipeJsonLd) {
+      return {};
+    }
+
+    return {
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(recipeJsonLd),
+        },
+      ],
+    };
+  },
+  component: DetailPage,
 });
 
-function RecipeDetail() {
-  const { recipeId } = Route.useParams();
+function toRecipeJsonLd(recipe: SerializedRecipe | null | undefined) {
+  const successRecipe =
+    recipe?.recipeSchema.result.status === "success"
+      ? recipe.recipeSchema.result
+      : null;
 
-  return <DetailPage recipeId={recipeId} />;
+  if (!successRecipe) {
+    return null;
+  }
+
+  return {
+    "@context": successRecipe.context,
+    "@type": successRecipe.type,
+    name: successRecipe.name,
+    description: successRecipe.description,
+    image: successRecipe.image,
+    recipeYield: successRecipe.recipeYield,
+    prepTime: successRecipe.prepTime,
+    cookTime: successRecipe.cookTime,
+    totalTime: successRecipe.totalTime,
+    recipeIngredient: successRecipe.recipeIngredient,
+    recipeInstructions: successRecipe.recipeInstructions.map((instruction) => ({
+      "@type": instruction.type,
+      text: instruction.text,
+    })),
+  };
 }

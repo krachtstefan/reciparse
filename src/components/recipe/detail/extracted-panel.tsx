@@ -1,4 +1,6 @@
-import { useQuery } from "convex/react";
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
 import { FileX, ScanText } from "lucide-react";
 import {
   Card,
@@ -12,12 +14,11 @@ import { CopyLinkButton } from "./copy-link-button";
 import { RecipeDetail } from "./recipe-detail";
 import { Skeleton } from "./skeleton";
 
-type ExtractedPanelProps = {
-  recipeId: string;
-};
-
-export function ExtractedPanel({ recipeId }: ExtractedPanelProps) {
-  const recipe = useQuery(api.recipe.getRecipe, { recipeId });
+export function ExtractedPanel() {
+  const { recipeId } = useParams({ from: "/recipe/$recipeId" });
+  const { data: recipe } = useSuspenseQuery(
+    convexQuery(api.recipe.getRecipe, { recipeId })
+  );
 
   const isNotFound = recipe === null;
 
