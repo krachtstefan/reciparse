@@ -22,7 +22,7 @@ export function InstructionList({ instructions }: InstructionListProps) {
       </h3>
       <ol className="mt-3 space-y-4">
         {instructions.map((step, index) => (
-          <li className="flex gap-3" key={step.text}>
+          <li className="flex gap-3" key={`${index}-${step.text}`}>
             <span className="flex size-6 flex-shrink-0 items-center justify-center rounded-full bg-primary font-medium text-primary-foreground text-xs">
               {index + 1}
             </span>
