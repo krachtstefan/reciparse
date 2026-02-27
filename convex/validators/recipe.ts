@@ -1,7 +1,7 @@
 import { type Infer, v } from "convex/values";
 
 export const schemaOrgRecipeFieldsValidator = v.object({
-  context: v.string(),
+  context: v.literal("https://schema.org"),
   type: v.literal("Recipe"),
   name: v.string(),
   description: v.string(),
