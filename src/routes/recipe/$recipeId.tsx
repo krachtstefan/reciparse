@@ -30,12 +30,13 @@ export const Route = createFileRoute("/recipe/$recipeId")({
       return {};
     }
     const recipeJsonLd = toRecipeJsonLd(loaderData.recipe);
+    const escapedRecipeJsonLd = escapeJsonForHtmlScript(recipeJsonLd);
 
     return {
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify(recipeJsonLd),
+          children: escapedRecipeJsonLd,
         },
       ],
     };
@@ -67,4 +68,11 @@ function toRecipeJsonLd(recipe: SuccessRecipeResult) {
       text: instruction.text,
     })),
   };
+}
+
+export function escapeJsonForHtmlScript(data: unknown): string {
+  return JSON.stringify(data)
+    .replaceAll("</script", "<\\/script")
+    .replaceAll("<!--", "<\\!--")
+    .replaceAll("-->", "--\\>");
 }
