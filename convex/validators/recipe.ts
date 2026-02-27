@@ -33,18 +33,16 @@ export type SchemaOrgRecipeFields = Infer<
   typeof schemaOrgRecipeFieldsValidator
 >;
 
-export const schemaOrgRecipeValidator = v.object({
-  result: v.union(
-    v.object({
-      status: v.literal("pending"),
-    }),
-    v.object({
-      status: v.literal("success"),
-      ...schemaOrgRecipeFieldsValidator.fields,
-    }),
-    v.object({
-      status: v.literal("failed"),
-      reason: v.string(),
-    })
-  ),
-});
+export const schemaOrgRecipeValidator = v.union(
+  v.object({
+    status: v.literal("pending"),
+  }),
+  v.object({
+    status: v.literal("success"),
+    ...schemaOrgRecipeFieldsValidator.fields,
+  }),
+  v.object({
+    status: v.literal("failed"),
+    reason: v.string(),
+  })
+);

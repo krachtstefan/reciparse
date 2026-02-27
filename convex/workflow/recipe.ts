@@ -110,13 +110,9 @@ export const generateHeadlineWorkflow = workflow.define({
         {
           recipeId: args.recipeId,
           recipeSchema: {
-            result: {
-              status: "failed",
-              reason:
-                error instanceof Error
-                  ? error.message
-                  : "Unknown error occurred",
-            },
+            status: "failed",
+            reason:
+              error instanceof Error ? error.message : "Unknown error occurred",
           },
         }
       );
@@ -163,15 +159,13 @@ export const generateSchemaOrgRecipeFromImage = internalAction({
         ],
         temperature: 0.4,
       });
-      return output;
+      return output.result;
     } catch (error) {
       console.error(error);
       return {
-        result: {
-          status: "failed" as const,
-          reason:
-            error instanceof Error ? error.message : "Unknown error occurred",
-        },
+        status: "failed" as const,
+        reason:
+          error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   },

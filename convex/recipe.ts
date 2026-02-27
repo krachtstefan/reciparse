@@ -43,9 +43,7 @@ export const createRecipe = mutation({
     const recipeId = await ctx.db.insert("recipes", {
       imageId: args.imageId,
       recipeSchema: {
-        result: {
-          status: "pending",
-        },
+        status: "pending",
       },
     });
 

@@ -39,7 +39,7 @@ function RecipeStatusContent({ recipeId }: { recipeId: string }) {
     );
   }
 
-  const result = recipe.recipeSchema.result;
+  const result = recipe.recipeSchema;
 
   if (result.status === "success") {
     return <Navigate params={{ recipeId }} replace to="/recipe/$recipeId" />;

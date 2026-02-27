@@ -16,8 +16,8 @@ export const Route = createFileRoute("/recipe/$recipeId")({
       throw notFound();
     }
 
-    if (recipe.recipeSchema.result.status === "success") {
-      return { recipe: recipe.recipeSchema.result };
+    if (recipe.recipeSchema.status === "success") {
+      return { recipe: recipe.recipeSchema };
     }
 
     throw redirect({
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/recipe/$recipeId")({
 });
 
 type SuccessRecipeResult = Extract<
-  SerializedRecipe["recipeSchema"]["result"],
+  SerializedRecipe["recipeSchema"],
   { status: "success" }
 >;
 
