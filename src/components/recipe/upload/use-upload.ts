@@ -48,7 +48,7 @@ export function useUpload() {
 
       const id = await createRecipe({ imageId });
       await navigate({
-        to: "/recipe/$recipeId",
+        to: "/processing/$recipeId",
         params: { recipeId: id },
       });
     } catch (error) {

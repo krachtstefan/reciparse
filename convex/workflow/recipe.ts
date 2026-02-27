@@ -1,4 +1,4 @@
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { v } from "convex/values";
 import { z } from "zod";
 import { internal } from "../_generated/api";
@@ -7,57 +7,77 @@ import {
   internalMutation,
   internalQuery,
 } from "../_generated/server";
-import { melaRecipeValidator } from "../validators/recipe";
+import { schemaOrgRecipeValidator } from "../validators/recipe";
 import { DEFAULT_MODEL, openrouter } from "./helper";
 import { workflow } from "./index";
 
-const melaRecipeSchema = z.object({
-  result: z
-    .union([
-      z
-        .object({
-          status: z
-            .literal("success")
-            .describe("The recipe was successfully extracted"),
-          id: z.string().min(1).describe("Unique identifier for the recipe"),
-          title: z.string().min(1).describe("Recipe title"),
-          text: z
-            .string()
-            .describe("Short description displayed after the title"),
-          images: z
-            .array(z.string())
-            .describe("Array of base64-encoded image strings"),
-          categories: z.array(z.string()).describe("Recipe categories"),
-          yield: z.string().describe("Number of servings the recipe makes"),
-          prepTime: z.string().describe("Preparation time"),
-          cookTime: z.string().describe("Cooking time"),
-          totalTime: z.string().describe("Total time (prep + cook)"),
-          ingredients: z
-            .string()
-            .describe(
-              "Newline-separated list of ingredients with Markdown support"
-            ),
-          instructions: z
-            .string()
-            .describe(
-              "Newline-separated cooking instructions with Markdown support"
-            ),
-          notes: z.string().describe("Additional notes with Markdown support"),
-          nutrition: z
-            .string()
-            .describe("Nutritional information with Markdown support"),
-          link: z.string().describe("Source of the recipe"),
-        })
-        .strict(),
-      z
-        .object({
-          status: z.literal("failed").describe("The recipe extraction failed"),
-          reason: z.string().describe("Reason for the failure"),
-        })
-        .strict(),
-    ])
-    .describe("The recipe extraction result"),
-});
+const createSchemaOrgRecipeSchema = (imageUrl: string) =>
+  z.object({
+    result: z
+      .union([
+        z
+          .object({
+            status: z
+              .literal("success")
+              .describe("The recipe was successfully extracted"),
+            context: z
+              .literal("https://schema.org")
+              .describe("Schema.org context URL"),
+            type: z.literal("Recipe").describe("Schema.org type"),
+            name: z.string().min(1).describe("Recipe title"),
+            description: z.string().describe("Short description of the recipe"),
+            inLanguage: z
+              .string()
+              .describe(
+                "The language of the recipe content using IETF BCP 47 standard (e.g., 'en' for English, 'es' for Spanish, 'fr' for French). Used by Temporal API for localized duration formatting. If uncertain, default to 'en'."
+              ),
+            image: z
+              .array(z.literal(imageUrl))
+              .describe("Array of image URLs constrained to source image"),
+            recipeYield: z.string().describe("Number of servings"),
+            prepTime: z
+              .string()
+              .describe("Preparation time (ISO 8601 duration)"),
+            cookTime: z.string().describe("Cooking time (ISO 8601 duration)"),
+            totalTime: z.string().describe("Total time (ISO 8601 duration)"),
+            recipeIngredient: z
+              .array(z.string())
+              .describe(
+                "List of ingredients, including quantities and units, e.g. '1 cup flour' or '2 eggs'"
+              ),
+            recipeInstructions: z
+              .array(
+                z.object({
+                  type: z.literal("HowToStep"),
+                  text: z.string().describe("Instruction step text"),
+                })
+              )
+              .describe("Cooking instructions as HowToStep array"),
+            comment: z
+              .object({
+                type: z.literal("Comment"),
+                text: z.string().describe("Additional notes"),
+              })
+              .describe("Recipe notes as Comment"),
+            nutrition: z
+              .object({
+                type: z.literal("NutritionInformation"),
+                description: z.string().describe("Nutritional information"),
+              })
+              .describe("Nutrition information"),
+          })
+          .strict(),
+        z
+          .object({
+            status: z
+              .literal("failed")
+              .describe("The recipe extraction failed"),
+            reason: z.string().describe("Reason for the failure"),
+          })
+          .strict(),
+      ])
+      .describe("The recipe extraction result in schema.org/Recipe format"),
+  });
 
 export const generateHeadlineWorkflow = workflow.define({
   args: {
@@ -70,8 +90,8 @@ export const generateHeadlineWorkflow = workflow.define({
     );
 
     try {
-      const melaRecipe = await step.runAction(
-        internal.workflow.recipe.generateMelaRecipeFromImage,
+      const recipeSchema = await step.runAction(
+        internal.workflow.recipe.generateSchemaOrgRecipeFromImage,
         { imageUrl },
         { retry: true }
       );
@@ -80,7 +100,7 @@ export const generateHeadlineWorkflow = workflow.define({
         internal.workflow.recipe.updateRecipeFromWorkflow,
         {
           recipeId: args.recipeId,
-          melaRecipe,
+          recipeSchema,
         }
       );
     } catch (error) {
@@ -88,14 +108,10 @@ export const generateHeadlineWorkflow = workflow.define({
         internal.workflow.recipe.updateRecipeFromWorkflow,
         {
           recipeId: args.recipeId,
-          melaRecipe: {
-            result: {
-              status: "failed",
-              reason:
-                error instanceof Error
-                  ? error.message
-                  : "Unknown error occurred",
-            },
+          recipeSchema: {
+            status: "failed",
+            reason:
+              error instanceof Error ? error.message : "Unknown error occurred",
           },
         }
       );
@@ -104,32 +120,34 @@ export const generateHeadlineWorkflow = workflow.define({
   },
 });
 
-export const generateMelaRecipeFromImage = internalAction({
+export const generateSchemaOrgRecipeFromImage = internalAction({
   args: {
     imageUrl: v.string(),
   },
-  returns: melaRecipeValidator,
+  returns: schemaOrgRecipeValidator,
   handler: async (_ctx, args) => {
     if (!process.env.OPENROUTER_API_KEY) {
       throw new Error("OPENROUTER_API_KEY is not set");
     }
 
     try {
-      const { object } = await generateObject({
+      const { output } = await generateText({
         model: openrouter(DEFAULT_MODEL),
-        schema: melaRecipeSchema,
+        output: Output.object({
+          schema: createSchemaOrgRecipeSchema(args.imageUrl),
+        }),
         messages: [
           {
             role: "system",
             content:
-              "You generate a Mela .melarecipe JSON object from an image. Output only valid JSON with all required fields. The response must be wrapped in a 'result' object that contains a 'status' field of either 'success' or 'failed'.",
+              "You are a recipe extraction assistant that analyzes images of recipes and outputs structured data in schema.org/Recipe format. Always return valid JSON wrapped in a 'result' object with a 'status' field ('success' or 'failed').",
           },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Generate a complete .melarecipe JSON for the dish in this image.\n\nRequirements:\n- Output only JSON, no markdown or code fences.\n- Keep the original language from the source.\n- Wrap the entire response in a 'result' object.\n- The 'result' object must contain a 'status' field with value 'success' or 'failed'.\n- If status is 'success', include all recipe fields in result: id, title, text, images, categories, yield, prepTime, cookTime, totalTime, ingredients, instructions, notes, nutrition, link.\n- If status is 'failed', include a 'reason' field in result explaining why extraction failed.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- categories: Always set to an empty array [].\n- ingredients: newline-separated string (\\n). Supports Markdown: links and # for group titles.\n- instructions: newline-separated string (\\n). Supports Markdown: #, *, **, and links.\n- notes: Supports Markdown: #, *, **, and links.\n- nutrition: Supports Markdown: #, *, **, and links.\n- text: Short description displayed after title. Supports Markdown: links only.\n- id: Use a UUID or recipe name as identifier. Do not leave empty.\n- link: Source of the recipe (can be any string, not just URL).\n- images: Array of base64-encoded image strings; empty array if none.\n",
+                text: "Extract recipe details from this image or screenshot and return a schema.org/Recipe JSON object.\n\nRequirements:\n- Only extract information that is explicitly visible in the image text; do not infer or invent recipe details from food photos.\n- Output only JSON, no markdown or code fences.\n- Keep the original language from the source.\n- Keep the original wording as much as possible.\n- Detect the language of the recipe (e.g., 'en' for English, 'es' for Spanish, 'fr' for French) and include it in the inLanguage field.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- If multiple recipes are visible, extract only the most prominent one.\n",
               },
               {
                 type: "image",
@@ -140,16 +158,13 @@ export const generateMelaRecipeFromImage = internalAction({
         ],
         temperature: 0.4,
       });
-
-      return object;
+      return output.result;
     } catch (error) {
       console.error(error);
       return {
-        result: {
-          status: "failed" as const,
-          reason:
-            error instanceof Error ? error.message : "Unknown error occurred",
-        },
+        status: "failed" as const,
+        reason:
+          error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   },
@@ -184,11 +199,11 @@ export const getRecipeImageUrl = internalQuery({
 export const updateRecipeFromWorkflow = internalMutation({
   args: {
     recipeId: v.id("recipes"),
-    melaRecipe: melaRecipeValidator,
+    recipeSchema: schemaOrgRecipeValidator,
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.recipeId, {
-      melaRecipe: args.melaRecipe,
+      recipeSchema: args.recipeSchema,
     });
   },
 });

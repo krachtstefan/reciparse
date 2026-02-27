@@ -5,10 +5,9 @@ const META_CARD_KEYS = ["prep", "cook", "yield", "total"] as const;
 const INGREDIENT_KEYS = ["i1", "i2", "i3", "i4", "i5", "i6"] as const;
 const STEP_KEYS = ["s1", "s2", "s3", "s4"] as const;
 
-export function Skeleton() {
+export function RecipeSkeleton() {
   return (
     <div className="fade-in animate-in space-y-6 duration-300">
-      {/* Title */}
       <div>
         <UISkeleton className="h-7 w-3/4" />
         <UISkeleton className="mt-2 h-4 w-full" />
@@ -22,7 +21,6 @@ export function Skeleton() {
 
       <Separator />
 
-      {/* Meta grid */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {META_CARD_KEYS.map((key) => (
           <UISkeleton className="h-20 rounded-lg" key={key} />
@@ -31,7 +29,6 @@ export function Skeleton() {
 
       <Separator />
 
-      {/* Ingredients */}
       <div>
         <UISkeleton className="h-6 w-32" />
         <div className="mt-3 space-y-2">
@@ -47,13 +44,12 @@ export function Skeleton() {
 
       <Separator />
 
-      {/* Instructions */}
       <div>
         <UISkeleton className="h-6 w-32" />
         <div className="mt-3 space-y-4">
           {STEP_KEYS.map((key) => (
             <div className="flex gap-3" key={key}>
-              <UISkeleton className="h-6 w-6 flex-shrink-0 rounded-full" />
+              <UISkeleton className="h-6 w-6 shrink-0 rounded-full" />
               <div className="flex-1 space-y-1">
                 <UISkeleton className="h-4 w-full" />
                 <UISkeleton className="h-4 w-4/5" />

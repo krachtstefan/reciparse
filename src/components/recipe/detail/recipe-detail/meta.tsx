@@ -1,7 +1,7 @@
+import type { SchemaOrgRecipeFields } from "convex/validators/recipe";
 import { ChefHat, Clock, Flame, Users } from "lucide-react";
 import type React from "react";
-import type { JSX } from "react";
-import type { MelaRecipeFields } from "../../../../../convex/helper";
+import { formatDuration } from "./duration";
 
 type MetaCardProps = {
   icon: React.ReactNode;
@@ -20,50 +20,34 @@ function MetaCard({ icon, label, value }: MetaCardProps) {
 }
 
 type RecipeMetaProps = {
-  recipe: MelaRecipeFields;
-};
-
-type MetaCard = {
-  icon: JSX.Element;
-  label: string;
-  value: string;
+  recipe: SchemaOrgRecipeFields;
 };
 
 export function RecipeMeta({ recipe }: RecipeMetaProps) {
-  const metaCards = [
-    recipe.prepTime
-      ? {
-          icon: <Clock className="size-4" />,
-          label: "Prep",
-          value: recipe.prepTime,
-        }
-      : undefined,
-    recipe.cookTime
-      ? {
-          icon: <Flame className="size-4" />,
-          label: "Cook",
-          value: recipe.cookTime,
-        }
-      : undefined,
-    recipe.yield
-      ? {
-          icon: <Users className="size-4" />,
-          label: "Yield",
-          value: recipe.yield,
-        }
-      : undefined,
-    recipe.totalTime
-      ? {
-          icon: <ChefHat className="size-4" />,
-          label: "Total",
-          value: recipe.totalTime,
-        }
-      : undefined,
-  ].filter((item): item is MetaCard => Boolean(item));
+  const locale = recipe.inLanguage ?? "en";
 
-  if (metaCards.length === 0) {
-    return null;
-  }
+  const metaCards = [
+    {
+      icon: <Clock className="size-4" />,
+      label: "Prep",
+      value: recipe.prepTime ? formatDuration(recipe.prepTime, locale) : "-",
+    },
+    {
+      icon: <Flame className="size-4" />,
+      label: "Cook",
+      value: recipe.cookTime ? formatDuration(recipe.cookTime, locale) : "-",
+    },
+    {
+      icon: <Users className="size-4" />,
+      label: "Yield",
+      value: recipe.recipeYield || "-",
+    },
+    {
+      icon: <ChefHat className="size-4" />,
+      label: "Total",
+      value: recipe.totalTime ? formatDuration(recipe.totalTime, locale) : "-",
+    },
+  ];
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

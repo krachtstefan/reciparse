@@ -4,21 +4,6 @@ import { mutation, query } from "./_generated/server";
 import { serializeRecipe } from "./helper";
 import { workflow } from "./workflow";
 
-export const getRecipes = query({
-  handler: async (ctx) => {
-    const recipes = await ctx.db.query("recipes").collect();
-    return Promise.all(
-      recipes.map(async (recipe) => {
-        const imageUrl = recipe.imageId
-          ? await ctx.storage.getUrl(recipe.imageId)
-          : null;
-
-        return serializeRecipe(recipe, imageUrl);
-      })
-    );
-  },
-});
-
 export const getRecipe = query({
   args: {
     recipeId: v.string(),
@@ -35,10 +20,11 @@ export const getRecipe = query({
       return null;
     }
 
-    const imageUrl = recipe.imageId
-      ? await ctx.storage.getUrl(recipe.imageId)
-      : null;
+    const imageUrl = await ctx.storage.getUrl(recipe.imageId);
 
+    if (!imageUrl) {
+      throw new Error("image not found");
+    }
     return serializeRecipe(recipe, imageUrl);
   },
 });
@@ -56,6 +42,9 @@ export const createRecipe = mutation({
   handler: async (ctx, args) => {
     const recipeId = await ctx.db.insert("recipes", {
       imageId: args.imageId,
+      recipeSchema: {
+        status: "pending",
+      },
     });
 
     await workflow.start(
