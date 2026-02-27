@@ -65,7 +65,6 @@ const createSchemaOrgRecipeSchema = (imageUrl: string) =>
                 description: z.string().describe("Nutritional information"),
               })
               .describe("Nutrition information"),
-            url: z.string().describe("Source URL of the recipe"),
           })
           .strict(),
         z

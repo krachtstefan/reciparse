@@ -26,7 +26,6 @@ export const schemaOrgRecipeFieldsValidator = v.object({
     type: v.literal("NutritionInformation"),
     description: v.string(),
   }),
-  url: v.string(),
 });
 
 export type SchemaOrgRecipeFields = Infer<
