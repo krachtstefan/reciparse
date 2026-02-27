@@ -11,21 +11,21 @@ export const Route = createFileRoute("/recipe/$recipeId")({
     const recipe = await opts.context.queryClient.ensureQueryData(
       convexQuery(api.recipe.getRecipe, { recipeId })
     );
-
     if (!recipe) {
       throw notFound();
     }
 
-    return {
-      recipe,
-    };
+    if (recipe.recipeSchema.result.status === "success") {
+      return { recipe: recipe.recipeSchema.result };
+    }
+
+    throw new Error("todo: redirect back to the intermediate pagej");
   },
   head: ({ loaderData }) => {
-    const recipeJsonLd = toRecipeJsonLd(loaderData?.recipe);
-
-    if (!recipeJsonLd) {
+    if (!loaderData) {
       return {};
     }
+    const recipeJsonLd = toRecipeJsonLd(loaderData.recipe);
 
     return {
       scripts: [
@@ -40,28 +40,24 @@ export const Route = createFileRoute("/recipe/$recipeId")({
   notFoundComponent: RecipeNotFound,
 });
 
-function toRecipeJsonLd(recipe: SerializedRecipe | null | undefined) {
-  const successRecipe =
-    recipe?.recipeSchema.result.status === "success"
-      ? recipe.recipeSchema.result
-      : null;
+type SuccessRecipeResult = Extract<
+  SerializedRecipe["recipeSchema"]["result"],
+  { status: "success" }
+>;
 
-  if (!successRecipe) {
-    return null;
-  }
-
+function toRecipeJsonLd(recipe: SuccessRecipeResult) {
   return {
-    "@context": successRecipe.context,
-    "@type": successRecipe.type,
-    name: successRecipe.name,
-    description: successRecipe.description,
-    image: successRecipe.image,
-    recipeYield: successRecipe.recipeYield,
-    prepTime: successRecipe.prepTime,
-    cookTime: successRecipe.cookTime,
-    totalTime: successRecipe.totalTime,
-    recipeIngredient: successRecipe.recipeIngredient,
-    recipeInstructions: successRecipe.recipeInstructions.map((instruction) => ({
+    "@context": recipe.context,
+    "@type": recipe.type,
+    name: recipe.name,
+    description: recipe.description,
+    image: recipe.image,
+    recipeYield: recipe.recipeYield,
+    prepTime: recipe.prepTime,
+    cookTime: recipe.cookTime,
+    totalTime: recipe.totalTime,
+    recipeIngredient: recipe.recipeIngredient,
+    recipeInstructions: recipe.recipeInstructions.map((instruction) => ({
       "@type": instruction.type,
       text: instruction.text,
     })),

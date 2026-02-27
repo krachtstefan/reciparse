@@ -9,7 +9,6 @@ export function CopyLinkButton() {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setIsCopied(true);
-
       setTimeout(() => {
         setIsCopied(false);
       }, 2000);
