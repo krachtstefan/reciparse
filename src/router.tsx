@@ -8,6 +8,13 @@ import { routeTree } from "./routeTree.gen";
 // Create a new router instance
 export const getRouter = () => {
   const { VITE_CONVEX_URL } = import.meta.env;
+
+  if (!VITE_CONVEX_URL) {
+    throw new Error(
+      "Missing VITE_CONVEX_URL environment variable required to initialize ConvexReactClient"
+    );
+  }
+
   const convexClient = new ConvexReactClient(VITE_CONVEX_URL);
   const convexQueryClient = new ConvexQueryClient(convexClient);
   const queryClient = new QueryClient({
