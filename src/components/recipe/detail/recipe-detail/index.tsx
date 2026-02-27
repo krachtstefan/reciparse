@@ -12,7 +12,6 @@ type RecipeDetailProps = {
 };
 
 export function RecipeDetail({ recipe }: RecipeDetailProps) {
-  recipe.totalTime;
   const hasIngredients = recipe.recipeIngredient.length > 0;
   const hasInstructions = recipe.recipeInstructions.length > 0;
 
