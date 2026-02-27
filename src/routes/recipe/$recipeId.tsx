@@ -1,7 +1,8 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { DetailPage } from "@/components/recipe/detail/detail-page";
-import { RecipeNotFound } from "@/components/recipe/detail/recipe-not-found";
+import { RecipeError } from "@/components/recipe/detail/error/recipe-error";
+import { RecipeNotFound } from "@/components/recipe/detail/error/recipe-not-found";
 import { api } from "../../../convex/_generated/api";
 import type { SerializedRecipe } from "../../../convex/helper";
 
@@ -37,6 +38,7 @@ export const Route = createFileRoute("/recipe/$recipeId")({
     };
   },
   component: DetailPage,
+  errorComponent: RecipeError,
   notFoundComponent: RecipeNotFound,
 });
 
