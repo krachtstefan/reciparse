@@ -1,4 +1,3 @@
-import { Layout } from "../../../layout";
 import {
   Empty,
   EmptyDescription,
@@ -16,13 +15,11 @@ export function ErrorStateTemplate({
   description,
 }: ErrorStateTemplateProps) {
   return (
-    <Layout>
-      <Empty>
-        <EmptyHeader>
-          <EmptyTitle>{title}</EmptyTitle>
-          <EmptyDescription>{description}</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    </Layout>
+    <Empty>
+      <EmptyHeader>
+        <EmptyTitle>{title}</EmptyTitle>
+        <EmptyDescription>{description}</EmptyDescription>
+      </EmptyHeader>
+    </Empty>
   );
 }

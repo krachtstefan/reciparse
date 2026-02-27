@@ -1,5 +1,5 @@
 import { convexQuery } from "@convex-dev/react-query";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 import { DetailPage } from "@/components/recipe/detail/detail-page";
 import { RecipeError } from "@/components/recipe/detail/error/recipe-error";
 import { RecipeNotFound } from "@/components/recipe/detail/error/recipe-not-found";
@@ -20,7 +20,10 @@ export const Route = createFileRoute("/recipe/$recipeId")({
       return { recipe: recipe.recipeSchema.result };
     }
 
-    throw new Error("todo: redirect back to the intermediate pagej");
+    throw redirect({
+      to: "/processing/$recipeId",
+      params: { recipeId },
+    });
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
