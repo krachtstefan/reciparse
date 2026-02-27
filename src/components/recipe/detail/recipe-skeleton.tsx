@@ -49,7 +49,7 @@ export function RecipeSkeleton() {
         <div className="mt-3 space-y-4">
           {STEP_KEYS.map((key) => (
             <div className="flex gap-3" key={key}>
-              <UISkeleton className="h-6 w-6 flex-shrink-0 rounded-full" />
+              <UISkeleton className="h-6 w-6 shrink-0 rounded-full" />
               <div className="flex-1 space-y-1">
                 <UISkeleton className="h-4 w-full" />
                 <UISkeleton className="h-4 w-4/5" />
