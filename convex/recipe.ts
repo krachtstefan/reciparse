@@ -20,12 +20,17 @@ export const getRecipe = query({
       return null;
     }
 
-    const imageUrl = await ctx.storage.getUrl(recipe.imageId);
+    const imageUrls = await Promise.all(
+      recipe.imageIds.map(async (imageId) => await ctx.storage.getUrl(imageId))
+    );
+    const validImageUrls = imageUrls.filter(
+      (imageUrl): imageUrl is string => imageUrl !== null
+    );
 
-    if (!imageUrl) {
+    if (validImageUrls.length === 0) {
       throw new Error("image not found");
     }
-    return serializeRecipe(recipe, imageUrl);
+    return serializeRecipe(recipe, validImageUrls);
   },
 });
 
@@ -37,11 +42,11 @@ export const generateUploadUrl = mutation({
 
 export const createRecipe = mutation({
   args: {
-    imageId: v.id("_storage"),
+    imageIds: v.array(v.id("_storage")),
   },
   handler: async (ctx, args) => {
     const recipeId = await ctx.db.insert("recipes", {
-      imageId: args.imageId,
+      imageIds: args.imageIds,
       recipeSchema: {
         status: "pending",
       },

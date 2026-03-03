@@ -4,40 +4,54 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 type UploadDropzoneProps = {
-  onImageSelect: (file: File, preview: string) => void;
-  preview: string | null;
+  onImageSelect: (files: File[], previews: string[]) => void;
+  previews: string[];
   onClear: () => void;
 };
 
 export function UploadDropzone({
   onImageSelect,
-  preview,
+  previews,
   onClear,
 }: UploadDropzoneProps) {
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleFile = (file: File) => {
-    if (!file.type.startsWith("image/")) {
+  const handleFiles = async (candidateFiles: FileList | File[]) => {
+    const files = Array.from(candidateFiles).filter((file) =>
+      file.type.startsWith("image/")
+    );
+    if (files.length === 0) {
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const imageDataUrl = e.target?.result;
-      if (typeof imageDataUrl !== "string") {
-        return;
-      }
-      onImageSelect(file, imageDataUrl);
-    };
-    reader.readAsDataURL(file);
+
+    const previewResults = await Promise.all(
+      files.map(
+        (file) =>
+          new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              const imageDataUrl = event.target?.result;
+              if (typeof imageDataUrl !== "string") {
+                reject(new Error("Unable to read selected image"));
+                return;
+              }
+              resolve(imageDataUrl);
+            };
+            reader.onerror = () => {
+              reject(new Error("Unable to read selected image"));
+            };
+            reader.readAsDataURL(file);
+          })
+      )
+    );
+
+    onImageSelect(files, previewResults);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      handleFile(file);
-    }
+    void handleFiles(e.dataTransfer.files);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -50,26 +64,33 @@ export function UploadDropzone({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFile(file);
+    const fileList = e.target.files;
+    if (fileList) {
+      void handleFiles(fileList);
     }
   };
 
-  if (preview) {
+  if (previews.length > 0) {
     return (
       <div className="group relative">
-        <div className="overflow-hidden rounded-lg border border-border bg-card">
-          <img
-            alt="Uploaded recipe"
-            className="h-auto max-h-[400px] w-full object-contain"
-            height={400}
-            src={preview}
-            width={600}
-          />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {previews.map((preview, index) => (
+            <div
+              className="overflow-hidden rounded-lg border border-border bg-card"
+              key={`${preview}-${index}`}
+            >
+              <img
+                alt={`Uploaded recipe ${index + 1}`}
+                className="h-auto max-h-[280px] w-full object-contain"
+                height={280}
+                src={preview}
+                width={420}
+              />
+            </div>
+          ))}
         </div>
         <Button
-          aria-label="Remove image"
+          aria-label="Remove images"
           className="absolute top-3 right-3 rounded-full bg-card text-card-foreground opacity-0 shadow-md transition-opacity hover:bg-secondary group-hover:opacity-100"
           onClick={onClear}
           size="icon"
@@ -96,6 +117,7 @@ export function UploadDropzone({
       <input
         accept="image/*"
         className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        multiple
         onChange={handleInputChange}
         type="file"
       />
@@ -112,7 +134,7 @@ export function UploadDropzone({
       </div>
       <div className="text-center">
         <p className="font-medium text-foreground text-sm">
-          Drop your recipe image here
+          Drop your recipe image(s) here
         </p>
         <p className="mt-1 text-muted-foreground text-xs">
           or click to browse. Supports JPG, PNG, WEBP

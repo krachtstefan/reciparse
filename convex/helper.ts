@@ -1,9 +1,12 @@
 import type { Doc } from "./_generated/dataModel";
 
-export const serializeRecipe = (recipe: Doc<"recipes">, imageUrl: string) => {
+export const serializeRecipe = (
+  recipe: Doc<"recipes">,
+  imageUrls: string[]
+) => {
   return {
     id: recipe._id,
-    imageUrl,
+    imageUrls,
     recipeSchema: recipe.recipeSchema,
   };
 };

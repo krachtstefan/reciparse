@@ -8,8 +8,8 @@ type UploadStatus = "idle" | "uploading" | "failed";
 
 export function useUpload() {
   const navigate = useNavigate();
-  const [preview, setPreview] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
 
   const generateUploadUrl = useMutation(api.recipe.generateUploadUrl);
@@ -17,36 +17,40 @@ export function useUpload() {
   const uploadImageMutation = useUploadImage();
 
   const handleImageSelect = useCallback(
-    (selectedFile: File, previewUrl: string) => {
-      setPreview(previewUrl);
-      setFile(selectedFile);
+    (selectedFiles: File[], previewUrls: string[]) => {
+      setPreviews(previewUrls);
+      setFiles(selectedFiles);
       setUploadStatus("idle");
     },
     []
   );
 
   const handleClear = useCallback(() => {
-    setPreview(null);
-    setFile(null);
+    setPreviews([]);
+    setFiles([]);
     setUploadStatus("idle");
   }, []);
 
   const handleParse = useCallback(async () => {
-    if (!file) {
+    if (files.length === 0) {
       return;
     }
 
     try {
       setUploadStatus("uploading");
 
-      const uploadUrl = await generateUploadUrl();
-      const result = await uploadImageMutation.mutateAsync({
-        uploadUrl,
-        image: file,
-      });
-      const imageId = result.storageId;
+      const imageIds = await Promise.all(
+        files.map(async (file) => {
+          const uploadUrl = await generateUploadUrl();
+          const result = await uploadImageMutation.mutateAsync({
+            uploadUrl,
+            image: file,
+          });
+          return result.storageId;
+        })
+      );
 
-      const id = await createRecipe({ imageId });
+      const id = await createRecipe({ imageIds });
       await navigate({
         to: "/processing/$recipeId",
         params: { recipeId: id },
@@ -55,14 +59,14 @@ export function useUpload() {
       console.error(error);
       setUploadStatus("failed");
     }
-  }, [createRecipe, file, generateUploadUrl, navigate, uploadImageMutation]);
+  }, [createRecipe, files, generateUploadUrl, navigate, uploadImageMutation]);
 
   const isIdle = uploadStatus === "idle";
   const isProcessing = uploadStatus === "uploading";
   const isFailed = uploadStatus === "failed";
 
   return {
-    preview,
+    previews,
     isIdle,
     isProcessing,
     isFailed,

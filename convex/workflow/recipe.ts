@@ -11,7 +11,7 @@ import { schemaOrgRecipeValidator } from "../validators/recipe";
 import { DEFAULT_MODEL, openrouter } from "./helper";
 import { workflow } from "./index";
 
-const createSchemaOrgRecipeSchema = (imageUrl: string) =>
+const createSchemaOrgRecipeSchema = (imageUrls: string[]) =>
   z.object({
     result: z
       .union([
@@ -32,8 +32,8 @@ const createSchemaOrgRecipeSchema = (imageUrl: string) =>
                 "The language of the recipe content using IETF BCP 47 standard (e.g., 'en' for English, 'es' for Spanish, 'fr' for French). Used by Temporal API for localized duration formatting. If uncertain, default to 'en'."
               ),
             image: z
-              .array(z.literal(imageUrl))
-              .describe("Array of image URLs constrained to source image"),
+              .array(z.enum(imageUrls as [string, ...string[]]))
+              .describe("Array of image URLs constrained to source image(s)"),
             recipeYield: z.string().describe("Number of servings"),
             prepTime: z
               .string()
@@ -84,15 +84,15 @@ export const generateHeadlineWorkflow = workflow.define({
     recipeId: v.id("recipes"),
   },
   handler: async (step, args): Promise<void> => {
-    const { imageUrl } = await step.runQuery(
-      internal.workflow.recipe.getRecipeImageUrl,
+    const { imageUrls } = await step.runQuery(
+      internal.workflow.recipe.getRecipeImageUrls,
       { recipeId: args.recipeId }
     );
 
     try {
       const recipeSchema = await step.runAction(
-        internal.workflow.recipe.generateSchemaOrgRecipeFromImage,
-        { imageUrl },
+        internal.workflow.recipe.generateSchemaOrgRecipeFromImages,
+        { imageUrls },
         { retry: true }
       );
 
@@ -120,9 +120,9 @@ export const generateHeadlineWorkflow = workflow.define({
   },
 });
 
-export const generateSchemaOrgRecipeFromImage = internalAction({
+export const generateSchemaOrgRecipeFromImages = internalAction({
   args: {
-    imageUrl: v.string(),
+    imageUrls: v.array(v.string()),
   },
   returns: schemaOrgRecipeValidator,
   handler: async (_ctx, args) => {
@@ -134,7 +134,7 @@ export const generateSchemaOrgRecipeFromImage = internalAction({
       const { output } = await generateText({
         model: openrouter(DEFAULT_MODEL),
         output: Output.object({
-          schema: createSchemaOrgRecipeSchema(args.imageUrl),
+          schema: createSchemaOrgRecipeSchema(args.imageUrls),
         }),
         messages: [
           {
@@ -147,12 +147,12 @@ export const generateSchemaOrgRecipeFromImage = internalAction({
             content: [
               {
                 type: "text",
-                text: "Extract recipe details from this image or screenshot and return a schema.org/Recipe JSON object.\n\nRequirements:\n- Only extract information that is explicitly visible in the image text; do not infer or invent recipe details from food photos.\n- Output only JSON, no markdown or code fences.\n- Keep the original language from the source.\n- Keep the original wording as much as possible.\n- Detect the language of the recipe (e.g., 'en' for English, 'es' for Spanish, 'fr' for French) and include it in the inLanguage field.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- If multiple recipes are visible, extract only the most prominent one.\n",
+                text: "Extract recipe details from these images or screenshots and return a schema.org/Recipe JSON object.\n\nRequirements:\n- Only extract information that is explicitly visible in the image text; do not infer or invent recipe details from food photos.\n- Output only JSON, no markdown or code fences.\n- Keep the original language from the source.\n- Keep the original wording as much as possible.\n- Detect the language of the recipe (e.g., 'en' for English, 'es' for Spanish, 'fr' for French) and include it in the inLanguage field.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- If multiple recipes are visible, extract only the most prominent one.\n",
               },
-              {
-                type: "image",
-                image: args.imageUrl,
-              },
+              ...args.imageUrls.map((imageUrl) => ({
+                type: "image" as const,
+                image: imageUrl,
+              })),
             ],
           },
         ],
@@ -170,12 +170,12 @@ export const generateSchemaOrgRecipeFromImage = internalAction({
   },
 });
 
-export const getRecipeImageUrl = internalQuery({
+export const getRecipeImageUrls = internalQuery({
   args: {
     recipeId: v.id("recipes"),
   },
   returns: v.object({
-    imageUrl: v.string(),
+    imageUrls: v.array(v.string()),
   }),
   handler: async (ctx, args) => {
     const recipe = await ctx.db.get(args.recipeId);
@@ -183,16 +183,22 @@ export const getRecipeImageUrl = internalQuery({
       throw new Error("Recipe not found");
     }
 
-    if (!recipe.imageId) {
-      throw new Error("Recipe has no image");
+    if (recipe.imageIds.length === 0) {
+      throw new Error("Recipe has no images");
     }
 
-    const imageUrl = await ctx.storage.getUrl(recipe.imageId);
-    if (!imageUrl) {
+    const imageUrls = await Promise.all(
+      recipe.imageIds.map(async (imageId) => await ctx.storage.getUrl(imageId))
+    );
+    const validImageUrls = imageUrls.filter(
+      (imageUrl): imageUrl is string => imageUrl !== null
+    );
+
+    if (validImageUrls.length === 0) {
       throw new Error("Unable to resolve image URL");
     }
 
-    return { imageUrl };
+    return { imageUrls: validImageUrls };
   },
 });
 

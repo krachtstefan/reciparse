@@ -14,7 +14,7 @@ const TIPS = [
 
 export function UploadPage() {
   const {
-    preview,
+    previews,
     isProcessing,
     isFailed,
     handleImageSelect,
@@ -22,8 +22,9 @@ export function UploadPage() {
     handleParse,
   } = useUpload();
 
-  const showTips = !preview;
-  const showButton = preview && !isFailed;
+  const hasSelectedImages = previews.length > 0;
+  const showTips = !hasSelectedImages;
+  const showButton = hasSelectedImages && !isFailed;
 
   return (
     <Layout>
@@ -35,7 +36,7 @@ export function UploadPage() {
           <UploadDropzone
             onClear={handleClear}
             onImageSelect={handleImageSelect}
-            preview={preview}
+            previews={previews}
           />
 
           {showTips && (
@@ -67,7 +68,7 @@ export function UploadPage() {
               {isProcessing ? (
                 <>
                   <LoaderCircle className="animate-spin" />
-                  Uploading image...
+                  Uploading image(s)...
                 </>
               ) : (
                 <>
