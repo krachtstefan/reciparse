@@ -6,7 +6,6 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import colors from "tailwindcss/colors";
 
 import appCss from "../styles.css?url";
 
@@ -14,8 +13,8 @@ type RouterContext = {
   queryClient: QueryClient;
 };
 
-const LIGHT_THEME_COLOR = colors.white;
-const DARK_THEME_COLOR = colors.slate[900];
+const LIGHT_THEME_COLOR = "oklch(1 0 0)";
+const DARK_THEME_COLOR = "oklch(0.13 0.028 261.692)";
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
