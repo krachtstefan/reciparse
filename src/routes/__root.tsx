@@ -6,12 +6,16 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import colors from "tailwindcss/colors";
 
 import appCss from "../styles.css?url";
 
 type RouterContext = {
   queryClient: QueryClient;
 };
+
+const LIGHT_THEME_COLOR = colors.white;
+const DARK_THEME_COLOR = colors.slate[900];
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
@@ -29,12 +33,12 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       {
         name: "theme-color",
         media: "(prefers-color-scheme: light)",
-        content: "#ffffff",
+        content: LIGHT_THEME_COLOR,
       },
       {
         name: "theme-color",
         media: "(prefers-color-scheme: dark)",
-        content: "#111827",
+        content: DARK_THEME_COLOR,
       },
       {
         name: "apple-mobile-web-app-capable",
