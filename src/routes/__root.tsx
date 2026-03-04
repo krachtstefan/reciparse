@@ -13,8 +13,7 @@ type RouterContext = {
   queryClient: QueryClient;
 };
 
-const LIGHT_THEME_COLOR = "oklch(1 0 0)";
-const DARK_THEME_COLOR = "oklch(0.13 0.028 261.692)";
+const DEFAULT_THEME_COLOR = "oklch(1 0 0)";
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
@@ -31,13 +30,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       },
       {
         name: "theme-color",
-        media: "(prefers-color-scheme: light)",
-        content: LIGHT_THEME_COLOR,
-      },
-      {
-        name: "theme-color",
-        media: "(prefers-color-scheme: dark)",
-        content: DARK_THEME_COLOR,
+        content: DEFAULT_THEME_COLOR,
       },
       {
         name: "apple-mobile-web-app-capable",
