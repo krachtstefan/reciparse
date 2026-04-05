@@ -25,7 +25,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     const theme = await readThemeCookie();
     return {
       theme,
-    } as const
+    } as const;
   },
   head: () => ({
     meta: [
