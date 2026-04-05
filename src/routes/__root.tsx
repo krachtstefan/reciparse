@@ -13,6 +13,8 @@ type RouterContext = {
   queryClient: QueryClient;
 };
 
+const DEFAULT_THEME_COLOR = "oklch(1 0 0)";
+
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
     meta: [
@@ -25,6 +27,18 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       },
       {
         title: "Reciparse",
+      },
+      {
+        name: "theme-color",
+        content: DEFAULT_THEME_COLOR,
+      },
+      {
+        name: "apple-mobile-web-app-capable",
+        content: "yes",
+      },
+      {
+        name: "apple-mobile-web-app-status-bar-style",
+        content: "black-translucent",
       },
     ],
     links: [

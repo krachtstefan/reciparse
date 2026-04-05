@@ -21,12 +21,29 @@ const getInitialTheme = (): Theme => {
     : "light";
 };
 
+const syncThemeColorMetaTag = (): void => {
+  const themeColorMetaTag = document.querySelector('meta[name="theme-color"]');
+  if (!themeColorMetaTag) {
+    return;
+  }
+
+  const bodyBackgroundColor = window.getComputedStyle(
+    document.body
+  ).backgroundColor;
+  if (!bodyBackgroundColor) {
+    return;
+  }
+
+  themeColorMetaTag.setAttribute("content", bodyBackgroundColor);
+};
+
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>(() => getInitialTheme());
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    syncThemeColorMetaTag();
   }, [theme]);
 
   const isDark = theme === "dark";
