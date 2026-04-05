@@ -3,6 +3,7 @@ import { z } from "zod";
 export const DEFAULT_THEME_COLOR = "oklch(1 0 0)" as const;
 const DARK_THEME_COLOR = "oklch(0.13 0.028 261.692)" as const;
 export const THEME_COOKIE_KEY = "reciparse-theme" as const;
+const THEME_STORAGE_KEY = THEME_COOKIE_KEY;
 
 export const LIGHT_THEME = "light" as const;
 export const DARK_THEME = "dark" as const;
@@ -54,7 +55,20 @@ export const getPreferredTheme = (): Theme => {
   }
 
   const cookieTheme = parseThemeCookie(document.cookie);
-  return resolveThemePreference(cookieTheme);
+  if (cookieTheme) {
+    return cookieTheme;
+  }
+
+  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+  return resolveThemePreference(storedTheme);
+};
+
+export const persistThemeLocally = (theme: Theme): void => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(THEME_STORAGE_KEY, theme);
 };
 
 const syncThemeColorMetaTag = (): void => {
@@ -90,13 +104,20 @@ export const applyTheme = (theme: Theme): void => {
 export const getThemeInitializationScript = (): string => `(() => {
   const lightTheme = "${LIGHT_THEME}";
   const darkTheme = "${DARK_THEME}";
+  const storageKey = "${THEME_STORAGE_KEY}";
   const cookieValue = document.cookie
     .split(";")
     .map((entry) => entry.trim())
     .find((entry) => entry.startsWith("${THEME_COOKIE_KEY}="))
     ?.slice(${THEME_COOKIE_KEY.length + 1});
-  const theme = cookieValue === darkTheme || cookieValue === lightTheme
+  const storedTheme = window.localStorage.getItem(storageKey);
+  const themePreference = cookieValue === darkTheme || cookieValue === lightTheme
     ? cookieValue
+    : storedTheme === darkTheme || storedTheme === lightTheme
+      ? storedTheme
+      : null;
+  const theme = themePreference
+    ? themePreference
     : window.matchMedia("(prefers-color-scheme: dark)").matches
       ? darkTheme
       : lightTheme;

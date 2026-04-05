@@ -7,6 +7,7 @@ import {
   getPreferredTheme,
   isDarkTheme,
   LIGHT_THEME,
+  persistThemeLocally,
   type Theme,
 } from "@/lib/theme";
 import { writeThemeCookie } from "@/lib/theme.server";
@@ -22,6 +23,7 @@ export function ThemeToggle() {
     }
 
     applyTheme(theme);
+    persistThemeLocally(theme);
     writeThemeCookie({ data: theme }).catch(() => undefined);
   }, [theme]);
 
