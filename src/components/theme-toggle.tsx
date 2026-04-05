@@ -1,59 +1,40 @@
 import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-
-const THEME_STORAGE_KEY = "reciparse-theme" as const;
-
-type Theme = "light" | "dark";
-
-const getInitialTheme = (): Theme => {
-  if (typeof window === "undefined") {
-    return "light";
-  }
-
-  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-  if (storedTheme === "dark" || storedTheme === "light") {
-    return storedTheme;
-  }
-
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-};
-
-const syncThemeColorMetaTag = (): void => {
-  const themeColorMetaTag = document.querySelector('meta[name="theme-color"]');
-  if (!themeColorMetaTag) {
-    return;
-  }
-
-  const bodyBackgroundColor = window.getComputedStyle(
-    document.body
-  ).backgroundColor;
-  if (!bodyBackgroundColor) {
-    return;
-  }
-
-  themeColorMetaTag.setAttribute("content", bodyBackgroundColor);
-};
+import {
+  applyTheme,
+  DARK_THEME,
+  getPreferredTheme,
+  isDarkTheme,
+  LIGHT_THEME,
+  persistThemeLocally,
+  type Theme,
+} from "@/lib/theme";
+import { writeThemeCookie } from "@/lib/theme.server";
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>(() => getInitialTheme());
+  const [theme, setTheme] = useState<Theme>(() => getPreferredTheme());
+  const isFirstRenderRef = useRef(true);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
-    syncThemeColorMetaTag();
+    if (isFirstRenderRef.current) {
+      isFirstRenderRef.current = false;
+      return;
+    }
+
+    applyTheme(theme);
+    persistThemeLocally(theme);
+    writeThemeCookie({ data: theme }).catch(() => undefined);
   }, [theme]);
 
-  const isDark = theme === "dark";
+  const isDark = isDarkTheme(theme);
 
   return (
     <Button
       aria-label="Toggle dark mode"
       aria-pressed={isDark}
       className="rounded-full"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
+      onClick={() => setTheme(isDark ? LIGHT_THEME : DARK_THEME)}
       size="icon"
       title={isDark ? "Switch to light mode" : "Switch to dark mode"}
       variant="outline"

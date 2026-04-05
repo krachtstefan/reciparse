@@ -6,6 +6,13 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import {
+  DARK_THEME,
+  DEFAULT_THEME_COLOR,
+  getThemeInitializationScript,
+  isDarkTheme,
+} from "@/lib/theme";
+import { readThemeCookie } from "@/lib/theme.server";
 
 import appCss from "../styles.css?url";
 
@@ -13,9 +20,13 @@ type RouterContext = {
   queryClient: QueryClient;
 };
 
-const DEFAULT_THEME_COLOR = "oklch(1 0 0)";
-
 export const Route = createRootRouteWithContext<RouterContext>()({
+  beforeLoad: async () => {
+    const theme = await readThemeCookie();
+    return {
+      theme,
+    } as const;
+  },
   head: () => ({
     meta: [
       {
@@ -53,10 +64,18 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const { theme } = Route.useRouteContext();
+
   return (
-    <html lang="en">
+    <html
+      className={theme && isDarkTheme(theme) ? DARK_THEME : undefined}
+      lang="en"
+      style={theme ? { colorScheme: theme } : undefined}
+      suppressHydrationWarning
+    >
       <head>
         <HeadContent />
+        <script>{getThemeInitializationScript()}</script>
       </head>
       <body>
         {children}
