@@ -1,49 +1,13 @@
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-
-const THEME_STORAGE_KEY = "reciparse-theme" as const;
-
-type Theme = "light" | "dark";
-
-const getInitialTheme = (): Theme => {
-  if (typeof window === "undefined") {
-    return "light";
-  }
-
-  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-  if (storedTheme === "dark" || storedTheme === "light") {
-    return storedTheme;
-  }
-
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-};
-
-const syncThemeColorMetaTag = (): void => {
-  const themeColorMetaTag = document.querySelector('meta[name="theme-color"]');
-  if (!themeColorMetaTag) {
-    return;
-  }
-
-  const bodyBackgroundColor = window.getComputedStyle(
-    document.body
-  ).backgroundColor;
-  if (!bodyBackgroundColor) {
-    return;
-  }
-
-  themeColorMetaTag.setAttribute("content", bodyBackgroundColor);
-};
+import { applyTheme, getPreferredTheme, type Theme } from "@/lib/theme";
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>(() => getInitialTheme());
+  const [theme, setTheme] = useState<Theme>(() => getPreferredTheme());
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
-    syncThemeColorMetaTag();
+    applyTheme(theme);
   }, [theme]);
 
   const isDark = theme === "dark";

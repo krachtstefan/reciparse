@@ -6,14 +6,13 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { DEFAULT_THEME_COLOR, getThemeInitializationScript } from "@/lib/theme";
 
 import appCss from "../styles.css?url";
 
 type RouterContext = {
   queryClient: QueryClient;
 };
-
-const DEFAULT_THEME_COLOR = "oklch(1 0 0)";
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
@@ -54,9 +53,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script>{getThemeInitializationScript()}</script>
       </head>
       <body>
         {children}
