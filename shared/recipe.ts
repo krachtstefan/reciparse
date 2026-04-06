@@ -1,0 +1,1 @@
+export const MAX_RECIPE_UPLOAD_IMAGES = 5;

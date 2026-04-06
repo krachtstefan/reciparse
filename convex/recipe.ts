@@ -1,7 +1,8 @@
 import { v } from "convex/values";
+import { MAX_RECIPE_UPLOAD_IMAGES } from "../shared/recipe";
 import { internal } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
-import { serializeRecipe } from "./helper";
+import { getRecipeImageIds, serializeRecipe } from "./helper";
 import { workflow } from "./workflow";
 
 export const getRecipe = query({
@@ -20,12 +21,12 @@ export const getRecipe = query({
       return null;
     }
 
-    const imageUrl = await ctx.storage.getUrl(recipe.imageId);
+    const [primaryImageId] = getRecipeImageIds(recipe);
+    const imageUrl = primaryImageId
+      ? await ctx.storage.getUrl(primaryImageId)
+      : null;
 
-    if (!imageUrl) {
-      throw new Error("image not found");
-    }
-    return serializeRecipe(recipe, imageUrl);
+    return serializeRecipe(recipe, imageUrl ?? "");
   },
 });
 
@@ -37,11 +38,28 @@ export const generateUploadUrl = mutation({
 
 export const createRecipe = mutation({
   args: {
-    imageId: v.id("_storage"),
+    imageId: v.optional(v.id("_storage")),
+    imageIds: v.optional(v.array(v.id("_storage"))),
   },
   handler: async (ctx, args) => {
+    const imageIds = args.imageIds ?? (args.imageId ? [args.imageId] : []);
+
+    if (args.imageId && args.imageIds) {
+      throw new Error("Pass either imageId or imageIds, not both");
+    }
+
+    if (imageIds.length === 0) {
+      throw new Error("At least one image is required");
+    }
+
+    if (imageIds.length > MAX_RECIPE_UPLOAD_IMAGES) {
+      throw new Error(
+        `A maximum of ${MAX_RECIPE_UPLOAD_IMAGES} images can be uploaded per recipe`
+      );
+    }
+
     const recipeId = await ctx.db.insert("recipes", {
-      imageId: args.imageId,
+      imageIds,
       recipeSchema: {
         status: "pending",
       },
