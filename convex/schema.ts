@@ -4,8 +4,7 @@ import { schemaOrgRecipeValidator } from "./validators/recipe";
 
 export default defineSchema({
   recipes: defineTable({
-    imageId: v.optional(v.id("_storage")),
-    imageIds: v.optional(v.array(v.id("_storage"))),
+    imageIds: v.array(v.id("_storage")),
     recipeSchema: schemaOrgRecipeValidator,
   }),
 });

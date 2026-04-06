@@ -8,7 +8,6 @@ import {
   internalMutation,
   internalQuery,
 } from "../_generated/server";
-import { getRecipeImageIds } from "../helper";
 import { schemaOrgRecipeValidator } from "../validators/recipe";
 import { DEFAULT_MODEL, openrouter } from "./helper";
 import { workflow } from "./index";
@@ -198,7 +197,7 @@ export const getRecipeImageUrls = internalQuery({
       throw new Error("Recipe not found");
     }
 
-    const imageIds = getRecipeImageIds(recipe);
+    const imageIds = recipe.imageIds;
     if (imageIds.length === 0) {
       throw new Error("Recipe has no images");
     }
