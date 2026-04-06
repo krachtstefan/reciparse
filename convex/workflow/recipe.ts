@@ -13,7 +13,7 @@ import { schemaOrgRecipeValidator } from "../validators/recipe";
 import { DEFAULT_MODEL, openrouter } from "./helper";
 import { workflow } from "./index";
 
-const createSchemaOrgRecipeSchema = (imageUrls: string[]) =>
+const createSchemaOrgRecipeSchema = () =>
   z.object({
     result: z
       .union([
@@ -33,14 +33,7 @@ const createSchemaOrgRecipeSchema = (imageUrls: string[]) =>
               .describe(
                 "The language of the recipe content using IETF BCP 47 standard (e.g., 'en' for English, 'es' for Spanish, 'fr' for French). Used by Temporal API for localized duration formatting. If uncertain, default to 'en'."
               ),
-            image: z
-              .array(
-                z.string().refine((value) => imageUrls.includes(value), {
-                  message:
-                    "Image URL must be one of the uploaded source images",
-                })
-              )
-              .describe("Array of image URLs constrained to source images"),
+            image: z.array(z.string()).describe("Array of recipe image URLs"),
             recipeYield: z.string().describe("Number of servings"),
             prepTime: z
               .string()
@@ -145,7 +138,7 @@ export const generateSchemaOrgRecipeFromImage = internalAction({
       const { output } = await generateText({
         model: openrouter(DEFAULT_MODEL),
         output: Output.object({
-          schema: createSchemaOrgRecipeSchema(args.imageUrls),
+          schema: createSchemaOrgRecipeSchema(),
         }),
         messages: [
           {
@@ -171,8 +164,9 @@ export const generateSchemaOrgRecipeFromImage = internalAction({
       });
 
       if (output.result.status === "success") {
-        // The model may return any subset/order of the uploaded URLs, but the
-        // stored recipe should always reflect the canonical uploaded source order.
+        // We do not trust the model to echo back the original source URLs.
+        // It may reorder them, drop some, or even invent placeholder/example
+        // URLs, so we always persist the canonical uploaded source order here.
         return {
           ...output.result,
           image: args.imageUrls,
