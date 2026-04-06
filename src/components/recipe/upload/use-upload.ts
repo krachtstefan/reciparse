@@ -1,52 +1,43 @@
 import { useNavigate } from "@tanstack/react-router";
+import type { Id } from "convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { useCallback, useState } from "react";
 import { api } from "../../../../convex/_generated/api";
 import { useUploadImage } from "../../../api/use-upload-image";
+import { useUploadSelection } from "./use-upload-selection";
 
 type UploadStatus = "idle" | "uploading" | "failed";
 
 export function useUpload() {
   const navigate = useNavigate();
-  const [preview, setPreview] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
+  const { files, selection, actions: selectionActions } = useUploadSelection();
 
   const generateUploadUrl = useMutation(api.recipe.generateUploadUrl);
   const createRecipe = useMutation(api.recipe.createRecipe);
   const uploadImageMutation = useUploadImage();
 
-  const handleImageSelect = useCallback(
-    (selectedFile: File, previewUrl: string) => {
-      setPreview(previewUrl);
-      setFile(selectedFile);
-      setUploadStatus("idle");
-    },
-    []
-  );
-
-  const handleClear = useCallback(() => {
-    setPreview(null);
-    setFile(null);
-    setUploadStatus("idle");
-  }, []);
-
   const handleParse = useCallback(async () => {
-    if (!file) {
+    if (files.length === 0) {
       return;
     }
 
     try {
       setUploadStatus("uploading");
 
-      const uploadUrl = await generateUploadUrl();
-      const result = await uploadImageMutation.mutateAsync({
-        uploadUrl,
-        image: file,
-      });
-      const imageId = result.storageId;
+      const imageIds: Id<"_storage">[] = [];
 
-      const id = await createRecipe({ imageId });
+      for (const file of files) {
+        const uploadUrl = await generateUploadUrl();
+        const result = await uploadImageMutation.mutateAsync({
+          uploadUrl,
+          image: file,
+        });
+
+        imageIds.push(result.storageId);
+      }
+
+      const id = await createRecipe({ imageIds });
       await navigate({
         to: "/processing/$recipeId",
         params: { recipeId: id },
@@ -55,19 +46,54 @@ export function useUpload() {
       console.error(error);
       setUploadStatus("failed");
     }
-  }, [createRecipe, file, generateUploadUrl, navigate, uploadImageMutation]);
+  }, [createRecipe, files, generateUploadUrl, navigate, uploadImageMutation]);
+
+  const addImages = useCallback(
+    (selectedFiles: File[]) => {
+      selectionActions.addImages(selectedFiles);
+      setUploadStatus("idle");
+    },
+    [selectionActions]
+  );
+
+  const moveImage = useCallback(
+    (itemId: string, direction: -1 | 1) => {
+      selectionActions.moveImage(itemId, direction);
+      setUploadStatus("idle");
+    },
+    [selectionActions]
+  );
+
+  const removeImage = useCallback(
+    (itemId: string) => {
+      selectionActions.removeImage(itemId);
+      setUploadStatus("idle");
+    },
+    [selectionActions]
+  );
+
+  const clear = useCallback(() => {
+    selectionActions.clear();
+    setUploadStatus("idle");
+  }, [selectionActions]);
 
   const isIdle = uploadStatus === "idle";
   const isProcessing = uploadStatus === "uploading";
   const isFailed = uploadStatus === "failed";
 
   return {
-    preview,
-    isIdle,
-    isProcessing,
-    isFailed,
-    handleImageSelect,
-    handleClear,
-    handleParse,
+    selection,
+    upload: {
+      isIdle,
+      isProcessing,
+      isFailed,
+    },
+    actions: {
+      addImages,
+      moveImage,
+      removeImage,
+      clear,
+      parse: handleParse,
+    },
   };
 }
