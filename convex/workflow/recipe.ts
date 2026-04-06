@@ -151,14 +151,14 @@ export const generateSchemaOrgRecipeFromImage = internalAction({
           {
             role: "system",
             content:
-              "You are a recipe extraction assistant that analyzes images of recipes and outputs structured data in schema.org/Recipe format. Always return valid JSON wrapped in a 'result' object with a 'status' field ('success' or 'failed').",
+              "You are a recipe extraction assistant that analyzes one ordered set of recipe images and outputs structured data in schema.org/Recipe format. Treat the images as sequential pages or screenshots for a single recipe unless the content clearly indicates otherwise. Always return valid JSON wrapped in a 'result' object with a 'status' field ('success' or 'failed').",
           },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Extract recipe details from this image or screenshot and return a schema.org/Recipe JSON object.\n\nRequirements:\n- Only extract information that is explicitly visible in the image text; do not infer or invent recipe details from food photos.\n- Output only JSON, no markdown or code fences.\n- Keep the original language from the source.\n- Keep the original wording as much as possible.\n- Detect the language of the recipe (e.g., 'en' for English, 'es' for Spanish, 'fr' for French) and include it in the inLanguage field.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- If multiple recipes are visible, extract only the most prominent one.\n",
+                text: "Extract recipe details from this ordered set of recipe images and return a schema.org/Recipe JSON object.\n\nThe images are provided in reading order. Earlier images come first, and later images may continue ingredients, instructions, notes, or metadata from previous images.\n\nRequirements:\n- Only extract information that is explicitly visible in the image text; do not infer or invent recipe details from food photos.\n- Consider all uploaded images together as one recipe when assembling the result.\n- Respect the provided image order when combining split sections across pages or screenshots.\n- Output only JSON, no markdown or code fences.\n- Keep the original language from the source.\n- Keep the original wording as much as possible.\n- Detect the language of the recipe (e.g., 'en' for English, 'es' for Spanish, 'fr' for French) and include it in the inLanguage field.\n- Use empty strings for unknown string fields and empty arrays for unknown lists.\n- Use the uploaded source image URLs in the same order they were provided.\n- If multiple recipes are visible, extract only the most prominent one.\n",
               },
               ...args.imageUrls.map((imageUrl) => ({
                 type: "image" as const,
@@ -169,6 +169,16 @@ export const generateSchemaOrgRecipeFromImage = internalAction({
         ],
         temperature: 0.4,
       });
+
+      if (output.result.status === "success") {
+        // The model may return any subset/order of the uploaded URLs, but the
+        // stored recipe should always reflect the canonical uploaded source order.
+        return {
+          ...output.result,
+          image: args.imageUrls,
+        };
+      }
+
       return output.result;
     } catch (error) {
       console.error(error);
