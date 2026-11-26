@@ -12,7 +12,7 @@ import {
   getThemeInitializationScript,
   isDarkTheme,
 } from "@/lib/theme";
-import { readThemeCookie } from "@/lib/theme.server";
+import { readThemeCookie } from "@/lib/theme-functions";
 
 import appCss from "../styles.css?url";
 

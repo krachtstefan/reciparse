@@ -22,7 +22,7 @@ export const readThemeCookie = createServerFn({ method: "GET" }).handler(() => {
 });
 
 export const writeThemeCookie = createServerFn({ method: "POST" })
-  .inputValidator(themeSchema)
+  .validator(themeSchema)
   .handler(({ data }) => {
     setResponseHeaders(
       new Headers({

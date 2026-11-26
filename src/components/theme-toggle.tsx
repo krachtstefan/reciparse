@@ -10,7 +10,7 @@ import {
   persistThemeLocally,
   type Theme,
 } from "@/lib/theme";
-import { writeThemeCookie } from "@/lib/theme.server";
+import { writeThemeCookie } from "@/lib/theme-functions";
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>(() => getPreferredTheme());
