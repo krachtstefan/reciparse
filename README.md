@@ -1,4 +1,7 @@
-Welcome to your new TanStack app! 
+# Reciparse
+
+Extract recipes from photos and save structured recipes through the hosted MCP
+server. See [MCP setup and tools](docs/mcp.md) for WorkOS, Convex and client setup.
 
 # Getting Started
 

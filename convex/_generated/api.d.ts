@@ -9,7 +9,13 @@
  */
 
 import type * as helper from "../helper.js";
+import type * as http from "../http.js";
+import type * as lib_contracts from "../lib/contracts.js";
+import type * as lib_mcp from "../lib/mcp.js";
+import type * as lib_oauth from "../lib/oauth.js";
+import type * as mcp from "../mcp.js";
 import type * as recipe from "../recipe.js";
+import type * as recipes from "../recipes.js";
 import type * as validators_recipe from "../validators/recipe.js";
 import type * as workflow_helper from "../workflow/helper.js";
 import type * as workflow_index from "../workflow/index.js";
@@ -23,7 +29,13 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   helper: typeof helper;
+  http: typeof http;
+  "lib/contracts": typeof lib_contracts;
+  "lib/mcp": typeof lib_mcp;
+  "lib/oauth": typeof lib_oauth;
+  mcp: typeof mcp;
   recipe: typeof recipe;
+  recipes: typeof recipes;
   "validators/recipe": typeof validators_recipe;
   "workflow/helper": typeof workflow_helper;
   "workflow/index": typeof workflow_index;

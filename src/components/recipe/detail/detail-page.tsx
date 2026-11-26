@@ -17,7 +17,7 @@ export function DetailPage() {
     <Layout>
       <Card>
         <CardHeader>
-          <CardTitle>Extracted Recipe</CardTitle>
+          <CardTitle>Recipe</CardTitle>
           <CardAction>
             <CopyLinkButton />
           </CardAction>
