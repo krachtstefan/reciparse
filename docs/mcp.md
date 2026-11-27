@@ -125,3 +125,30 @@ The second account must not list, read through MCP, edit or delete the first
 account's recipes. Also verify the existing website photo-upload flow.
 
 Do not treat local JWT tests as proof of WorkOS login, consent or refresh.
+
+## Preview acceptance, 2026-11-27
+
+The branch `feat/mcp-server` was deployed to:
+
+https://reciparse-git-feat-mcp-server-stefan-krachts-projects.vercel.app/mcp
+
+The live MCP SDK client passed WorkOS discovery, dynamic registration, email-code
+sign-in, consent, PKCE and token exchange, then initialized the hosted MCP server.
+It created a recipe, checked its public page, listed and read it, updated it,
+confirmed a stale delete returned `VERSION_CONFLICT`, and deleted it. The public
+page then returned 404. No test recipe was retained.
+
+Staging settings were reread: Magic Auth enabled; password, passkeys, enterprise
+SSO and all social providers disabled. The preview uses the separate Reciparse
+WorkOS staging environment and branch-specific Convex backend.
+
+Local checks passed all 43 tests, lint, types and dependency checks. The production
+build passed after upgrading TanStack Start to address Vercel's security block.
+Live refresh, a second-account isolation check and the existing photo-upload
+workflow were not exercised by this acceptance run.
+
+Production has not been changed. Before promoting, configure the Reciparse
+WorkOS production environment with the same email-only methods and registration
+settings, register `https://recipe.stefan.wtf/mcp`, and set its issuer and resource
+on the production Convex deployment. Repeat live acceptance against production
+after deploying.
